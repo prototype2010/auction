@@ -18,3 +18,7 @@ const Route = use('Route')
 
 Route.on('/').render('welcome')
 Route.get('/test', 'LotController.index')
+Route.resource('/users', 'UserController')
+  .except(['GET'])
+  .formats(['json'])
+
