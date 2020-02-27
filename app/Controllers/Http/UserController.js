@@ -19,11 +19,9 @@ class UserController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    const { email, password, username } =  request.post();
+    const params =  request.only([ 'email', 'password',  'firstname', 'lastname', 'phone', 'birthday']);
 
-    const user = await User.create({
-      email, password, username
-    });
+    const user = await User.create(params);
 
     return  user;
   }

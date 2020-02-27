@@ -1,55 +1,39 @@
-const faker = require('faker');
 const { test, trait } = use('Test/Suite')('User');
-
+const Factory = use('Factory');
+const User = use('App/Models/User');
 
 trait('Test/ApiClient');
 
-test('Create new user', async ({ client }) => {
+test('POST user.store (200)', async ({ client }) => {
 
-  const fakeUser = {
-    email: faker.internet.email(),
-    username: faker.internet.userName(),
-    password: faker.internet.password(),
-  };
+  const fakeUser = await Factory.get('App/Models/User').make({password: 'asdasdasd'});
 
   const response = await client.post('/users').send(fakeUser).end();
 
   response.assertStatus(200);
 });
 
-test('Get created user by ID', async ({ client }) => {
+test('POST user.store (200)', async ({ client, assert }) => {
 
-  const fakeUser = {
-    email: faker.internet.email(),
-    username: faker.internet.userName(),
-    password: faker.internet.password(),
-  };
+  const usersAmountBefore = (await User.all()).rows.length;
 
-  const createdUser = await client.post('/users').send(fakeUser).end();
+  const fakeUser = await Factory.get('App/Models/User').make({password: 'asdasdasd'});
 
-  const user = JSON.parse(createdUser.text);
+  await client.post('/users').send(fakeUser).end();
 
-  const gotById = await client.get(`/users/${user.id}`).end();
+  const usersAmountAfter = (await User.all()).rows.length;
 
-  gotById.assertJSONSubset(user);
+  assert.equal(usersAmountBefore + 1, usersAmountAfter);
 });
 
-test('Created user can be updated', async ({ client }) => {
+test('GET user.show', async ({ client, assert }) => {
 
-  const fakeUser = {
-    email: faker.internet.email(),
-    username: faker.internet.userName(),
-    password: faker.internet.password(),
-  };
+  const fakeUser = await Factory.model('App/Models/User').create();
 
-  const createdUser = await client.post('/users').send(fakeUser).end();
-  const createdUserInfo = JSON.parse(createdUser.text);
-  const updateInfo = {
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-  };
+  const response = await client.get(`/users/${fakeUser.id}`).end();
 
-  const updatedUser = await client.put(`/users/${createdUserInfo.id}`).send(updateInfo).end();
+  response.assertStatus(200);
 
-  updatedUser.assertJSONSubset({email: updateInfo.email});
-});
+  assert.containsAllKeys(fakeUser.toJSON(),response.body)
+
+}).timeout(0);
