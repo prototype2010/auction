@@ -19,6 +19,10 @@ const Route = use('Route')
 Route.on('/').render('welcome')
 Route.get('/test', 'LotController.index')
 Route.resource('/users', 'UserController')
+  .validator(new Map([
+    [['users.store'], ['UserStore']],
+  ]))
   .except(['GET'])
   .formats(['json'])
+
 
