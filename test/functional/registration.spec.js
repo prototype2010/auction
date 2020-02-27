@@ -35,7 +35,6 @@ test('GET user.show (200)', async ({ client, assert }) => {
   response.assertStatus(200);
 
   assert.containsAllKeys(fakeUser.toJSON(),response.body)
-
 });
 
 
