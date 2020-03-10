@@ -21,6 +21,7 @@ class UserSchema extends Schema {
       table.timestamp('birthday', 80).notNullable();
       table.timestamps();
     });
+
   }
 
   down() {

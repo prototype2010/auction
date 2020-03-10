@@ -23,3 +23,4 @@ Route.resource('users', 'UserController')
 Route.resource('lots', 'LotController').validator(
   new Map([[['lots.store'], ['LotStore']]])
 );
+

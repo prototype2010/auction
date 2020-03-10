@@ -37,6 +37,7 @@ module.exports = (cli, runner) => {
     // await ace.call('migration:run', {}, { silent: true })
   });
 
+
   runner.after(async () => {
     /*
     |--------------------------------------------------------------------------
@@ -50,6 +51,7 @@ module.exports = (cli, runner) => {
       .getInstance()
       .close();
 
+
     /*
     |--------------------------------------------------------------------------
     | Rollback migrations
@@ -62,3 +64,4 @@ module.exports = (cli, runner) => {
     // await ace.call('migration:reset', {}, { silent: true })
   });
 };
+

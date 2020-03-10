@@ -23,6 +23,7 @@ const providers = [
   '@adonisjs/validator/providers/ValidatorProvider',
 ];
 
+
 /*
 |--------------------------------------------------------------------------
 | Ace Providers
@@ -34,7 +35,7 @@ const providers = [
 */
 const aceProviders = [
   '@adonisjs/lucid/providers/MigrationsProvider',
-  '@adonisjs/vow/providers/VowProvider',
+  '@adonisjs/vow/providers/VowProvider'
 ];
 
 /*

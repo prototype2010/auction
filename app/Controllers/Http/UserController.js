@@ -19,6 +19,7 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
+
   async store({ request }) {
     const params = request.only([
       'email',
@@ -32,6 +33,7 @@ class UserController {
     const user = await User.create(params);
 
     return user;
+
   }
 
   /**
@@ -43,8 +45,10 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
+
   async show({ params }) {
     const { id } = params;
+
 
     const user = await User.find(id);
 
@@ -59,6 +63,7 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
+
   async update({ params, request, response }) {
     const { id } = params;
     const { email, password } = request.post();
@@ -66,6 +71,7 @@ class UserController {
     const user = await User.find(id);
 
     if (user) {
+
       user.email = email;
       user.password = password;
 
@@ -79,6 +85,7 @@ class UserController {
     response.status(404);
 
     response.send({ message: 'User not found' });
+
   }
 
   /**
@@ -93,3 +100,4 @@ class UserController {
 }
 
 module.exports = UserController;
+

@@ -41,3 +41,6 @@ Factory.blueprint('App/Models/User', async () => ({
 }));
 
 Factory.blueprint('App/Models/Bid', async () => ({}));
+    name: faker.name()
+  }
+});

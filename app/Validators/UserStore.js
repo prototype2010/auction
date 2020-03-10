@@ -4,6 +4,7 @@ const { BaseValidator } = require('./BaseValidator');
 
 class UserStore extends BaseValidator {
   get rules() {
+
     return {
       email: 'required|email|unique:users',
       password: 'required',
