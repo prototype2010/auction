@@ -6,6 +6,7 @@ test('lint test', async ({ assert }) => {
     const childProcess = exec('npm run lint', (error, stdout) => {
       if (error && error.code) {
         /* if error will be returned - it prints stdout */
+        /* eslint-disable-next-line */
         console.error(stdout);
       }
     });

@@ -18,4 +18,3 @@ class DatabaseSeeder {
 }
 
 module.exports = DatabaseSeeder;
-

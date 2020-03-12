@@ -25,9 +25,7 @@ test('POST user.store (200)', async ({ client }) => {
 test('POST user.store (200)', async ({ client, assert }) => {
   const usersAmountBefore = (await User.all()).rows.length;
 
-  const fakeUser = await Factory.get('App/Models/User').make({
-    password: 'asdasdasd',
-  });
+  const fakeUser = await Factory.get('App/Models/User').make({ password: 'asdasdasd' });
 
   await client
     .post('/users')
@@ -55,9 +53,7 @@ test('GET user.show (200)', async ({ client, assert }) => {
 });
 
 test('POST user.store (422) empty password', async ({ client }) => {
-  const fakeUser = await Factory.get('App/Models/User').make({
-    password: 'asdasdasd',
-  });
+  const fakeUser = await Factory.get('App/Models/User').make({ password: 'asdasdasd' });
 
   const response = await client
     .post('/users')
@@ -71,9 +67,7 @@ test('POST user.store (422) empty password', async ({ client }) => {
 }).timeout(0);
 
 test('POST user.store (422) empty email', async ({ client }) => {
-  const fakeUser = await Factory.get('App/Models/User').make({
-    password: 'asdasdasd',
-  });
+  const fakeUser = await Factory.get('App/Models/User').make({ password: 'asdasdasd' });
 
   const response = await client
     .post('/users')
@@ -87,9 +81,7 @@ test('POST user.store (422) empty email', async ({ client }) => {
 });
 
 test('POST user.store (422) age < 21', async ({ client }) => {
-  const fakeUser = await Factory.get('App/Models/User').make({
-    password: 'asdasdasd',
-  });
+  const fakeUser = await Factory.get('App/Models/User').make({ password: 'asdasdasd' });
 
   const response = await client
     .post('/users')

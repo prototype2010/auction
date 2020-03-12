@@ -33,7 +33,6 @@ class UserController {
     const user = await User.create(params);
 
     return user;
-
   }
 
   /**
@@ -71,7 +70,6 @@ class UserController {
     const user = await User.find(id);
 
     if (user) {
-
       user.email = email;
       user.password = password;
 
@@ -85,7 +83,6 @@ class UserController {
     response.status(404);
 
     response.send({ message: 'User not found' });
-
   }
 
   /**
@@ -100,4 +97,3 @@ class UserController {
 }
 
 module.exports = UserController;
-

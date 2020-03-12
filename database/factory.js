@@ -40,7 +40,4 @@ Factory.blueprint('App/Models/User', async () => ({
   phone: Faker.phone.phoneNumber(),
 }));
 
-Factory.blueprint('App/Models/Bid', async () => ({}));
-    name: faker.name()
-  }
-});
+Factory.blueprint('App/Models/Bid', async () => ({ }));
