@@ -1,6 +1,6 @@
-'use strict'
-const Lot = use('App/Models/Lot')
+'use strict';
 
+const Lot = use('App/Models/Lot');
 
 class LotController {
   async index() {
@@ -10,4 +10,4 @@ class LotController {
   }
 }
 
-module.exports = LotController
+module.exports = LotController;

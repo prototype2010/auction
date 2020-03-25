@@ -1,0 +1,22 @@
+{
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "extends": "airbnb-base",
+  "rules": {
+    "strict": "off",
+    "class-methods-use-this": "off",
+    "object-curly-newline": ["error", { "multiline": true }],
+    "global-require": "off",
+    "arrow-parens": ["error", "as-needed"],
+    "no-param-reassign": ["error", { "props": false }],
+    "consistent-return": "off"
+  },
+  "globals": {
+    "use": true
+  },
+  "parser": "babel-eslint"
+}

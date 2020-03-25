@@ -1,4 +1,15 @@
 {
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./app/*.{js,ts}": [
+      "npx prettier --write",
+      "eslint '**/*.js' --fix-dry-run"
+    ]
+  },
   "name": "adonis-fullstack-app",
   "version": "4.1.0",
   "adonis-version": "4.1.0",
@@ -7,7 +18,9 @@
   "scripts": {
     "start": "node server.js",
     "test": "node ace test",
-    "test:watch": "nodemon ace test"
+    "test:watch": "nodemon ace test",
+    "prettier": "prettier --single-quote --trailing-comma es5 --write \"./**/*.js\"",
+    "lint": "eslint '**/*.js' --fix-dry-run"
   },
   "keywords": [
     "adonisjs",
@@ -29,12 +42,22 @@
     "@adonisjs/shield": "^1.0.8",
     "@adonisjs/validator": "^5.0.6",
     "@adonisjs/vow": "^1.0.17",
+    "indicative": "^7.4.4",
     "moment": "^2.24.0",
+    "faker": "^4.1.0",
     "pg": "^7.18.1"
   },
   "devDependencies": {
-    "faker": "^4.1.0",
-    "nodemon": "^2.0.2"
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
+    "nodemon": "^2.0.2",
+    "prettier": "^1.19.1"
+
   },
   "autoload": {
     "App": "./app"

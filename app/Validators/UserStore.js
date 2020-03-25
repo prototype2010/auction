@@ -1,15 +1,17 @@
-'use strict'
+'use strict';
 
-class UserStore {
-  get rules () {
+const { BaseValidator } = require('./BaseValidator');
+
+class UserStore extends BaseValidator {
+  get rules() {
     return {
       email: 'required|email|unique:users',
       password: 'required',
       firstname: 'required',
       lastname: 'required',
       phone: 'required|unique:users',
-      birthday: 'required',
-    }
+      birthday: 'required|allowedAge',
+    };
   }
 }
 

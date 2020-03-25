@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /*
 |--------------------------------------------------------------------------
@@ -14,15 +14,12 @@
 */
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
-const Route = use('Route')
+const Route = use('Route');
 
-Route.on('/').render('welcome')
-Route.get('/test', 'LotController.index')
-Route.resource('/users', 'UserController')
-  .validator(new Map([
-    [['users.store'], ['UserStore']],
-  ]))
-  .except(['GET'])
-  .formats(['json'])
+Route.resource('users', 'UserController')
+  .except(['index'])
+  .validator(new Map([[['users.store'], ['UserStore']]]));
 
-
+Route.resource('lots', 'LotController').validator(
+  new Map([[['lots.store'], ['LotStore']]]),
+);

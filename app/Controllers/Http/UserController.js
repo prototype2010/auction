@@ -9,6 +9,7 @@ const User = use('App/Models/User');
 /**
  * Resourceful controller for interacting with users
  */
+
 class UserController {
   /**
    * Create/save a new user.
@@ -18,12 +19,20 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
-    const params =  request.only([ 'email', 'password',  'firstname', 'lastname', 'phone', 'birthday']);
+
+  async store({ request }) {
+    const params = request.only([
+      'email',
+      'password',
+      'firstname',
+      'lastname',
+      'phone',
+      'birthday',
+    ]);
 
     const user = await User.create(params);
 
-    return  user;
+    return user;
   }
 
   /**
@@ -35,8 +44,10 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-    const {id} = params;
+
+  async show({ params }) {
+    const { id } = params;
+
 
     const user = await User.find(id);
 
@@ -51,15 +62,14 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
 
-    const {id} = params;
-    const { email, password } =  request.post();
+  async update({ params, request, response }) {
+    const { id } = params;
+    const { email, password } = request.post();
 
     const user = await User.find(id);
 
-    if(user) {
-
+    if (user) {
       user.email = email;
       user.password = password;
 
@@ -68,11 +78,11 @@ class UserController {
       const updatedUser = await User.find(id);
 
       return updatedUser;
-
-    } else {
-      response.status(404);
-      response.message('User not found');
     }
+
+    response.status(404);
+
+    response.send({ message: 'User not found' });
   }
 
   /**
@@ -83,8 +93,7 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
-  }
+  // async destroy ({ params, request, response }) {}
 }
 
-module.exports = UserController
+module.exports = UserController;
