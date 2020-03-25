@@ -5,7 +5,7 @@ const Schema = use('Schema');
 
 class LotsSchema extends Schema {
   up() {
-    this.create('lots', table => {
+    this.create('lots', (table) => {
       table.increments();
       table.string('name', 80).notNullable();
       table.timestamps();

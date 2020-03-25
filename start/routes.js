@@ -16,10 +16,20 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route');
 
-Route.resource('users', 'UserController')
-  .except(['index'])
-  .validator(new Map([[['users.store'], ['UserStore']]]));
+Route.group(() => {
+  Route.post('login', 'AuthController.login');
+  Route.post('logout', 'AuthController.logout');
+  Route.post('refresh', 'AuthController.refresh');
+  Route.post('password-recovery', 'AuthController.passwordRecovery');
+  Route.get('password-recovery/:token', 'AuthController.applyPasswordRecovery');
+}).prefix('users/auth');
 
-Route.resource('lots', 'LotController').validator(
-  new Map([[['lots.store'], ['LotStore']]]),
-);
+Route.post('users', 'UserController.store').validator('UserStore');
+//
+Route.resource('users', 'UserController')
+  .only(['show', 'update'])
+  .middleware('auth');
+
+Route.resource('lots', 'LotController')
+  .validator(new Map([[['lots.store'], ['LotStore']]]))
+  .middleware('auth');

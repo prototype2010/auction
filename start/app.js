@@ -21,8 +21,8 @@ const providers = [
   '@adonisjs/auth/providers/AuthProvider',
   '@adonisjs/lucid/providers/LucidProvider',
   '@adonisjs/validator/providers/ValidatorProvider',
+  '@adonisjs/mail/providers/MailProvider',
 ];
-
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +35,7 @@ const providers = [
 */
 const aceProviders = [
   '@adonisjs/lucid/providers/MigrationsProvider',
-  '@adonisjs/vow/providers/VowProvider'
+  '@adonisjs/vow/providers/VowProvider',
 ];
 
 /*
