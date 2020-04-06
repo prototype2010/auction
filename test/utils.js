@@ -13,7 +13,7 @@ const createUserWithParams = async (client, overrideParams = {}) => {
   return response;
 };
 
-const getUserToken = async (client) => {
+const getUserToken = async client => {
   const password = faker.internet.password();
 
   const { body: user } = await createUserWithParams(client, { password });
@@ -30,7 +30,7 @@ const getUserToken = async (client) => {
 };
 
 const getRecentEmail = async () => {
-  await new Promise((res) => setTimeout(res, 200));
+  await new Promise(res => setTimeout(res, 200));
 
   return Mail.recent();
 };
@@ -39,7 +39,7 @@ const getPasswordFromLastEmail = async () => {
   const lastEmail = await getRecentEmail();
 
   const [, newPassword] = lastEmail.message.html.match(
-    /New password : ([a-zA-Z0-9]*)/
+    /New password : ([a-zA-Z0-9]*)/,
   );
 
   return newPassword;

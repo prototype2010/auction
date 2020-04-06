@@ -6,11 +6,12 @@ class LotStore extends BaseValidator {
   get rules() {
     return {
       title: 'required',
-      status: 'required',
+      description: 'string',
+      image: 'required_when:file|file_size:5mb|file_types:image',
       currentPrice: 'required|number',
-      estimatedPrice: 'required|number',
+      estimatedPrice: 'required|number|validLotPrices',
       lotStartTime: 'required|date',
-      lotEndTime: 'required|date',
+      lotEndTime: 'required|date|validLotDates',
     };
   }
 }
