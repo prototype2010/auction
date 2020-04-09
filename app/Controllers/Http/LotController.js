@@ -30,19 +30,19 @@ class LotController {
 
     const user = await auth.getUser();
 
-    const lot = await Lot.create({
-      title,
-      currentPrice,
-      estimatedPrice,
-      lotStartTime,
-      lotEndTime,
-      user_id: user.id,
-      image,
-  })
+    const lot = new Lot();
 
-     await user.lots().save(lot);
+    lot.user_id = user.id;
+    lot.title = title;
+    lot.currentPrice = currentPrice;
+    lot.estimatedPrice = estimatedPrice;
+    lot.lotStartTime = lotStartTime;
+    lot.lotEndTime = lotEndTime;
+    lot.image = image;
 
-    return lot.toJSON();
+    await lot.save();
+
+    return lot;
   }
 
 

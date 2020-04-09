@@ -3,18 +3,26 @@
 const Mail = use('Mail');
 const Factory = use('Factory');
 const faker = require('faker');
+const _ = require('lodash');
 
-const createLotWithParams = async (client, lotParams = {}) => {
+const createUser = async (overrideParams = {}) => {
 
-  const { token } = (await getUserToken(client)).body;
+  const user = await Factory.model('App/Models/User').make();
 
-  const lot = await Factory.get('App/Models/Lot').make();
+  _.merge(user,overrideParams)
 
-  const lotResponse = await client.post('/lots').send(lot)
-    .header('Authorization', `bearer ${token}`)
-    .end();
+  await user.save();
 
-  return lotResponse;
+  return user;
+}
+
+const makeLot = async (overrideParams = {}) => {
+
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  Object.assign(lot,overrideParams)
+
+  return lot;
 }
 
 const createUserWithParams = async (client, overrideParams = {}) => {
@@ -83,5 +91,6 @@ module.exports = {
   getRecentEmail,
   getPasswordFromLastEmail,
   getRecoveryTokenFromLastEmail,
-  createLotWithParams,
+  createUser,
+  makeLot,
 };
