@@ -111,16 +111,6 @@ class UserController {
 
     return authUser;
   }
-
-  /**
-   * Delete a user with id.
-   * DELETE users/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  // async destroy ({ params, request, response }) {}
 }
 
 module.exports = UserController;

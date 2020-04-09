@@ -34,3 +34,17 @@ Event.on('user::passwordLost', async (user) => {
     }
   );
 });
+
+Event.on('lot::new', async lot => {
+
+  /// maybe redis ???
+});
+
+Event.on('lot::update', async lot => {
+  //// maybe redis ???
+});
+
+Event.on('lot::delete', async lot => {
+  /// maybe redis
+});
+

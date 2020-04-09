@@ -2,6 +2,7 @@
 const Lot = use('App/Models/Lot');
 const Helpers = use('Helpers')
 const uid = require('uid');
+const Event = use('Event');
 
 class LotController {
 
@@ -18,9 +19,11 @@ class LotController {
       estimatedPrice,
       lotStartTime,
       lotEndTime,
+      description
     } = request.only([
       'title',
       'currentPrice',
+      'description',
       'estimatedPrice',
       'lotStartTime',
       'lotEndTime',
@@ -33,13 +36,18 @@ class LotController {
     const lot = new Lot();
 
     lot.user_id = user.id;
+    lot.description = description;
+    lot.title = title;
     lot.currentPrice = currentPrice;
     lot.estimatedPrice = estimatedPrice;
     lot.lotStartTime = lotStartTime;
     lot.lotEndTime = lotEndTime;
     lot.image = image;
+    lot.status = 'pending';
 
     await lot.save();
+
+    Event.fire('lot::new', lot);
 
     return Lot.find(lot.id);
   }
@@ -82,9 +90,11 @@ class LotController {
       estimatedPrice,
       lotStartTime,
       lotEndTime,
+      description
     } = request.only([
       'title',
       'currentPrice',
+      'description',
       'estimatedPrice',
       'lotStartTime',
       'lotEndTime',
@@ -102,6 +112,7 @@ class LotController {
       lot.image = await this.saveImageIfAttached(request);
       lot.status = 'pending';
       lot.title = title;
+      lot.description = description;
       lot.currentPrice = currentPrice;
       lot.estimatedPrice = estimatedPrice;
       lot.lotStartTime = lotStartTime;
@@ -109,10 +120,12 @@ class LotController {
 
       await lot.save();
 
+      Event.fire('lot::update', lot);
+
       return lot;
 
 
-    } else if (lot.status !== 'pending') {
+    } else if (lot && lot.status !== 'pending') {
       response
         .status(403)
         .send({
@@ -124,8 +137,8 @@ class LotController {
       response
         .status(404)
         .send({
-        message: `Lot not found`
-      });
+          message: `Lot not found`
+        });
     }
   }
 
@@ -152,6 +165,41 @@ class LotController {
       return null;
     }
   }
+
+  async destroy ({ params, auth, response }) {
+    const { id : userId} = await auth.getUser();
+
+    const lot = await Lot.findBy({
+      user_id: userId,
+      id: params.id,
+    });
+
+    if(! lot ) {
+      response
+        .status(404)
+        .send({
+          message: `Lot not found`
+        });
+    } else if(lot.status !== 'pending' ) {
+      response
+        .status(403)
+        .send({
+          message: `Only lots in pending status can be deleted`
+        });
+    } else {
+      await lot.delete();
+
+      Event.fire('lot::delete', lot);
+
+      response
+        .status(200)
+        .send({
+          message: 'ok'
+        });
+    }
+  }
+
+
 }
 
 module.exports = LotController;
