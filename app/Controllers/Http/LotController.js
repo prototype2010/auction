@@ -33,7 +33,6 @@ class LotController {
     const lot = new Lot();
 
     lot.user_id = user.id;
-    lot.title = title;
     lot.currentPrice = currentPrice;
     lot.estimatedPrice = estimatedPrice;
     lot.lotStartTime = lotStartTime;
@@ -42,7 +41,7 @@ class LotController {
 
     await lot.save();
 
-    return lot;
+    return Lot.find(lot.id);
   }
 
 
@@ -70,9 +69,8 @@ class LotController {
 
     if(lot && lot.status === 'pending') {
 
-      const image = await this.saveImageIfAttached(request);
-
-      lot.image = image;
+      lot.image = await this.saveImageIfAttached(request);
+      lot.status = 'pending';
       lot.title = title;
       lot.currentPrice = currentPrice;
       lot.estimatedPrice = estimatedPrice;

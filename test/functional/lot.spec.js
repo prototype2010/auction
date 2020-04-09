@@ -50,8 +50,7 @@ test('POST 200 Lot contains all required keys', async ({ assert, client }) => {
     .loginVia(user, 'jwt')
     .end();
 
-
-  assert.containsAllKeys(lotResponse.body, ['title', 'currentPrice', 'estimatedPrice','lotStartTime','lotEndTime','user_id','image','created_at','updated_at','id']);
+  assert.containsAllKeys(lotResponse.body, ['title', 'currentPrice', 'estimatedPrice','lotStartTime','lotEndTime','user_id','image','created_at','updated_at','id','status']);
 });
 
 
@@ -71,7 +70,7 @@ test('POST 200 Lot can be created by http', async ({ assert, client }) => {
     .end();
 
   lotResponse.assertStatus(200);
-  assert.containsAllKeys(lotResponse.body, ['title', 'currentPrice', 'estimatedPrice','lotStartTime','lotEndTime','user_id','image','created_at','updated_at','id']);
+  assert.containsAllKeys(lotResponse.body, ['title', 'currentPrice', 'estimatedPrice','lotStartTime','lotEndTime','user_id','image','created_at','updated_at','id','status']);
 });
 
 test('POST 200 Image can be attached', async ({ assert, client }) => {
@@ -228,7 +227,7 @@ test('POST 422 Lot can\'t be created with both current and estimated price = 0',
   lotResponse.assertStatus(422);
 });
 
-test('POST 422 Lot can\'t be created with both current and estimated price = 0', async ({ assert, client }) => {
+test('POST 422 Lot can\'t be created with both current and estimated price string', async ({ assert, client }) => {
 
   const user = await createUser();
   const lot = await makeLot({
@@ -244,6 +243,25 @@ test('POST 422 Lot can\'t be created with both current and estimated price = 0',
   assert.equal(lotResponse.body[0].message, 'number validation failed on estimatedPrice');
 
   lotResponse.assertStatus(422);
+});
+
+
+
+test('POST 200 Lot is created with pending status', async ({ assert, client }) => {
+
+  const user = await createUser();
+  const lot = await makeLot();
+
+  const lotResponse = await client.post('/lots')
+    .send(lot.toJSON())
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+  const dbLot = await Lot.find(lotResponse.body.id);
+
+  assert.equal(dbLot.status, 'pending');
+
+  lotResponse.assertStatus(200);
 });
 
 
