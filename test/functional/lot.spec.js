@@ -245,8 +245,6 @@ test('POST 422 Lot can\'t be created with both current and estimated price strin
   lotResponse.assertStatus(422);
 });
 
-
-
 test('POST 200 Lot is created with pending status', async ({ assert, client }) => {
 
   const user = await createUser();
@@ -265,3 +263,4 @@ test('POST 200 Lot is created with pending status', async ({ assert, client }) =
 });
 
 
+// get lot test

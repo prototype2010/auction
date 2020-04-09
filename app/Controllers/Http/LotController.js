@@ -45,6 +45,36 @@ class LotController {
   }
 
 
+  /**
+   * Display a single user.
+   * GET users/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @param {View} ctx.view
+   */
+
+  async show({ params, auth, response }) {
+    const { id } = params;
+
+    const authUser = await auth.getUser();
+
+    const lot = await Lot.findBy({
+      id,
+      user_id: authUser.id
+    });
+
+    if(lot) {
+      return lot;
+    } else {
+      response.status(404).send({
+        message: 'Lot not found'
+      });
+    }
+  }
+
+
   async update({ params, request, response, auth }) {
     const {
       title,
