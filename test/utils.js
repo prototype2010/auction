@@ -1,6 +1,21 @@
+/* eslint-disable */
+
 const Mail = use('Mail');
 const Factory = use('Factory');
 const faker = require('faker');
+
+const createLotWithParams = async (client, lotParams = {}) => {
+
+  const { token } = (await getUserToken(client)).body;
+
+  const lot = await Factory.get('App/Models/Lot').make();
+
+  const lotResponse = await client.post('/lots').send(lot)
+    .header('Authorization', `bearer ${token}`)
+    .end();
+
+  return lotResponse;
+}
 
 const createUserWithParams = async (client, overrideParams = {}) => {
   const fakeUser = await Factory.get('App/Models/User').make();
@@ -11,6 +26,11 @@ const createUserWithParams = async (client, overrideParams = {}) => {
     .end();
 
   return response;
+};
+
+const getDBRowsNumber = async (entity) => {
+  const { rows } = await entity.all();
+  return rows.length;
 };
 
 const getUserToken = async client => {
@@ -57,9 +77,11 @@ const getRecoveryTokenFromLastEmail = async () => {
 };
 
 module.exports = {
+  getDBRowsNumber,
   createUserWithParams,
   getUserToken,
   getRecentEmail,
   getPasswordFromLastEmail,
   getRecoveryTokenFromLastEmail,
+  createLotWithParams,
 };

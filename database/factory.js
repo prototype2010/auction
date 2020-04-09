@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 |--------------------------------------------------------------------------
 | Factory
@@ -21,13 +19,11 @@ Factory.blueprint('App/Models/Lot', () => {
 
   return {
     title: Faker.lorem.words(),
-    image: Faker.image.imageUrl(),
     description: Faker.lorem.sentence(),
-    status: 'pending',
     currentPrice: price,
     estimatedPrice: price * 2,
-    lotStartTime: new Date().toISOString(),
-    lotEndTime: new Date(Date.now() + 999999).toISOString(),
+    lotStartTime: moment().add(10, 'minutes').toISOString(),
+    lotEndTime: moment().add(2, 'hour').toISOString(),
   };
 });
 

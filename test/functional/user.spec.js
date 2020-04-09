@@ -1,19 +1,16 @@
 /* eslint-disable */
 const { test, trait } = use('Test/Suite')('User');
 
+trait('Test/ApiClient');
+trait('Auth/Client');
+
 const User = use('App/Models/User');
 const moment = require('moment');
 const faker = require('faker');
 
-const { createUserWithParams } = require('../utils');
+const { createUserWithParams, getDBRowsNumber } = require('../utils');
 
-trait('Test/ApiClient');
-trait('Auth/Client');
 
-const getDBRowsNumber = async (entity) => {
-  const { rows } = await entity.all();
-  return rows.length;
-};
 
 test('POST user.store (200). User can be created', async ({ client }) => {
   const response = await createUserWithParams(client);
