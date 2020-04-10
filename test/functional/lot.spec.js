@@ -540,7 +540,7 @@ test('After delete lot correct event is fired', async ({ assert, client }) => {
   const {event , data } = Event.recent();
 
   assert.equal(event,'lot::delete');
-  assert.deepEqual(JSON.stringify(data[0].toJSON()),JSON.stringify(lotResponse.body)); // without .stringify does not work
+  assert.deepEqual(JSON.stringify(data[0].toJSON()),JSON.stringify(lotResponse.body)); // without .stringify does not work. Fucking adonis !!!
 
   Event.restore();
 });
