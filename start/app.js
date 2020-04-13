@@ -51,7 +51,9 @@ const aceProviders = [
 |   { Route: 'Adonis/Src/Route' }
 |
 */
-const aliases = {};
+const aliases = {
+  LotManager: 'App/Helpers/LotManager'
+};
 
 /*
 |--------------------------------------------------------------------------

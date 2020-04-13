@@ -1,4 +1,3 @@
-
 class LotManager {
   constructor(fileManager) {
     this.fileManager = fileManager;
@@ -43,4 +42,4 @@ class LotManager {
   }
 }
 
-module.exports = { LotManager };
+module.exports = LotManager;

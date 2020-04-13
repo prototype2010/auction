@@ -4,6 +4,7 @@ const { test, trait } = use('Test/Suite')('Lot');
 const Factory = use('Factory');
 const Lot = use('App/Models/Lot');
 const Event = use('Event');
+const LotManager = use('LotManager');
 
 const { timeout } = use ('Test/Runner');
 timeout(99999999);
