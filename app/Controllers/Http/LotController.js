@@ -30,9 +30,7 @@ class LotController {
     ]);
 
     const image = await this.saveImageIfAttached(request);
-
     const user = await auth.getUser();
-
     const lot = new Lot();
 
     lot.user_id = user.id;
