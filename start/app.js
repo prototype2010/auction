@@ -1,11 +1,12 @@
-'use strict';
+
+const path = require('path');
 
 /*
 |--------------------------------------------------------------------------
-| Providers
+| providers
 |--------------------------------------------------------------------------
 |
-| Providers are building blocks for your Adonis app. Anytime you install
+| providers are building blocks for your Adonis app. Anytime you install
 | a new Adonis specific package, chances are you will register the
 | provider here.
 |
@@ -23,15 +24,16 @@ const providers = [
   '@adonisjs/validator/providers/ValidatorProvider',
   '@adonisjs/mail/providers/MailProvider',
   '@adonisjs/redis/providers/RedisProvider',
+  path.join(__dirname, '..', 'providers', 'LotManagerProvider'),
 ];
 
 /*
 |--------------------------------------------------------------------------
-| Ace Providers
+| Ace providers
 |--------------------------------------------------------------------------
 |
 | Ace providers are required only when running ace commands. For example
-| Providers for migrations, tests etc.
+| providers for migrations, tests etc.
 |
 */
 const aceProviders = [
@@ -51,9 +53,7 @@ const aceProviders = [
 |   { Route: 'Adonis/Src/Route' }
 |
 */
-const aliases = {
-  LotManager: 'App/Helpers/LotManager'
-};
+const aliases = {};
 
 /*
 |--------------------------------------------------------------------------

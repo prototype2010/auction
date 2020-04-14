@@ -1,10 +1,8 @@
+// const { FileManager } = require('./FileManager');
+
 class LotManager {
   constructor(fileManager) {
     this.fileManager = fileManager;
-  }
-
-  static getInstance(fileManager) {
-    return new LotManager(fileManager);
   }
 
   async saveLot(lot) {
@@ -13,7 +11,7 @@ class LotManager {
     await this.fileManager.save(id, this.toJSON(lot));
   }
 
-  async getLotInfo(lotId) {
+  async getLot(lotId) {
     const fileContent = await this.fileManager.read(lotId);
 
     const lotInfo = this.fromJSON(fileContent);
@@ -33,7 +31,7 @@ class LotManager {
 
   toJSON(data) {
     try {
-      return JSON.stringify(data);
+      return JSON.stringify(data, null, 4);
     } catch (e) {
       console.error(`Failed to stringify data ${data}`);
 

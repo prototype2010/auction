@@ -1,19 +1,18 @@
-const { existsSync, createWriteStream, createReadStream } = require('fs');
+const { createReadStream, createWriteStream, existsSync } = require('fs');
+const path = require('path');
 
 class FileManager {
-  static folderPath = '';
+  constructor(folderPath = '../../tmp/lots') {
+    const resolvedPath = path.resolve(__dirname, folderPath);
 
-  static getInstance(folderPath) {
-    if (!existsSync(folderPath)) {
-      throw new Error(`There is no folder to save files! You should create folder by path ${folderPath}`);
+    if (!existsSync(resolvedPath)) {
+      throw new Error(`There is no folder to save files! You should create folder by path ${resolvedPath}`);
     }
 
-    FileManager.folderPath = folderPath;
-
-    return FileManager;
+    this.folderPath = resolvedPath;
   }
 
-  static async save(fileName, fileData) {
+  async save(fileName, fileData) {
     return new Promise(res => {
       const writeStream = createWriteStream(this.resolveFilePath(fileName));
 
@@ -25,11 +24,11 @@ class FileManager {
     });
   }
 
-  static resolveFilePath(fileName) {
+  resolveFilePath(fileName) {
     return `${this.folderPath}/${fileName}`;
   }
 
-  static async read(fileName) {
+  async read(fileName) {
     return new Promise(res => {
       const writeStream = createReadStream(this.resolveFilePath(fileName));
 
@@ -49,4 +48,4 @@ class FileManager {
   }
 }
 
-module.exports = { FileManager };
+module.exports = FileManager;

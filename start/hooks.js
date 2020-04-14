@@ -9,7 +9,3 @@ hooks.after.providersBooted(() => {
   Validator.extend('validLotPrices', validLotPrices);
   Validator.extend('validLotDates', validLotDates);
 });
-
-// hooks.before.httpServer(() => {
-//   const Role = use('LotManager');
-// });

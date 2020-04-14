@@ -5,7 +5,7 @@ const Mail = use('Mail');
 const APP_EMAIL = Env.get('MAIL_USERNAME');
 const LOTS_PATH = Env.get('LOTS_PATH');
 const Redis = use('Redis');
-// const LotManager = use('LotManager');
+const LotManager = use('LotManager');
 
 
 Event.on('user::new', async (user) => {
@@ -41,15 +41,9 @@ Event.on('user::passwordLost', async (user) => {
 
 Event.on('lot::new', async lot => {
 
-  const lot2 = await Redis.set(lot.id, JSON.stringify(lot.toJSON()))
+  await LotManager.saveLot(lot);
 
-  console.log(process.cwd());
-
-  const lots = await Redis.get(lot.id)
-
-  console.log(JSON.stringify(lots))
-
-  /// maybe redis ???
+  await Redis.set(lot.id, JSON.stringify(lot.toJSON()))
 });
 
 Event.on('lot::update', async lot => {
