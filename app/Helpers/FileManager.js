@@ -1,4 +1,4 @@
-const { createReadStream, createWriteStream, existsSync } = require('fs');
+const { createReadStream, createWriteStream, existsSync, unlink } = require('fs');
 const path = require('path');
 
 class FileManager {
@@ -39,11 +39,24 @@ class FileManager {
       });
 
       writeStream.on('end', () => {
-        writeStream.end();
         res(data);
       });
     }).catch(e => {
       console.error(`Failed to open write stream to file ${fileName}, ${e}`);
+    });
+  }
+
+  async delete(fileName) {
+    return new Promise((res, rej) => {
+      unlink(this.resolveFilePath(fileName), err => {
+        if (err) {
+          rej(err);
+        } else {
+          return res();
+        }
+      });
+    }).catch(e => {
+      console.error(`Failed to delete file ${fileName}, ${e}`);
     });
   }
 }

@@ -1,4 +1,3 @@
-// const { FileManager } = require('./FileManager');
 
 class LotManager {
   constructor(fileManager) {
@@ -8,7 +7,7 @@ class LotManager {
   async saveLot(lot) {
     const { id } = lot;
 
-    await this.fileManager.save(id, this.toJSON(lot));
+    return this.fileManager.save(id, this.toJSON(lot));
   }
 
   async getLot(lotId) {
@@ -17,6 +16,14 @@ class LotManager {
     const lotInfo = this.fromJSON(fileContent);
 
     return lotInfo;
+  }
+
+  async updateLot(lot) {
+    return this.saveLot(lot);
+  }
+
+  async deleteLot(lotId) {
+    return this.fileManager.delete(lotId);
   }
 
   fromJSON(data) {

@@ -43,14 +43,19 @@ Event.on('lot::new', async lot => {
 
   await LotManager.saveLot(lot);
 
-  await Redis.set(lot.id, JSON.stringify(lot.toJSON()))
+  await Redis.set(lot.id, JSON.stringify(lot))
 });
 
 Event.on('lot::update', async lot => {
-  //// maybe redis ???
+  await LotManager.saveLot(lot);
+
+  await Redis.set(lot.id, JSON.stringify(lot))
 });
 
 Event.on('lot::delete', async lot => {
-  /// maybe redis
+  await LotManager.deleteLot(lot.id);
+
+  await Redis.del(lot.id, JSON.stringify(lot))
+
 });
 
