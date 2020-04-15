@@ -6,6 +6,7 @@ const APP_EMAIL = Env.get('MAIL_USERNAME');
 const LOTS_PATH = Env.get('LOTS_PATH');
 const Redis = use('Redis');
 const LotManager = use('LotManager');
+const TaskManager = use('TaskManager');
 
 
 Event.on('user::new', async (user) => {
@@ -41,7 +42,11 @@ Event.on('user::passwordLost', async (user) => {
 
 Event.on('lot::new', async lot => {
   await LotManager.saveLot(lot);
-  await Redis.set(lot.id, JSON.stringify(lot))
+
+  const serializedLot = JSON.stringify(lot)
+
+  await Redis.set(lot.id,serializedLot )
+  await TaskManager.add(serializedLot);
 });
 
 Event.on('lot::update', async lot => {
