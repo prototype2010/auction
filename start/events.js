@@ -8,6 +8,8 @@ const Redis = use('Redis');
 const LotManager = use('LotManager');
 const TaskManager = use('TaskManager');
 
+const moment = require('moment');
+
 
 Event.on('user::new', async (user) => {
   await Mail.send('emails.welcome', user, (message) => {
@@ -43,10 +45,11 @@ Event.on('user::passwordLost', async (user) => {
 Event.on('lot::new', async lot => {
   await LotManager.saveLot(lot);
 
-  const serializedLot = JSON.stringify(lot)
+  const serializedLot = lot.toJSON();
 
   await Redis.set(lot.id,serializedLot )
-  await TaskManager.add(serializedLot);
+
+  TaskManager.add(serializedLot, { delay: 0 });
 });
 
 Event.on('lot::update', async lot => {

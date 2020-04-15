@@ -8,7 +8,7 @@ const LotManager = use('LotManager');
 const fs = require('fs');
 
 const { timeout } = use ('Test/Runner');
-timeout(99999999);
+timeout(Number.MAX_SAFE_INTEGER);
 
 trait('Test/ApiClient');
 trait('Auth/Client');
