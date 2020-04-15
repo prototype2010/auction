@@ -40,14 +40,12 @@ Event.on('user::passwordLost', async (user) => {
 });
 
 Event.on('lot::new', async lot => {
-
   await LotManager.saveLot(lot);
-
   await Redis.set(lot.id, JSON.stringify(lot))
 });
 
 Event.on('lot::update', async lot => {
-  await LotManager.saveLot(lot);
+  await LotManager.updateLot(lot);
 
   await Redis.set(lot.id, JSON.stringify(lot))
 });
