@@ -585,6 +585,7 @@ test('Lot manager updates lots correctly', async ({ assert, client }) => {
 
   assert.deepEqual(savedLot,updatedLotInfo);
 });
+
 test('Lot manager deletes lots correctly', async ({ assert, client }) => {
 
   const user = await createUser();
@@ -604,6 +605,3 @@ test('Lot manager deletes lots correctly', async ({ assert, client }) => {
   assert.isNotOk(fs.existsSync(filePath),'File should not exist')
 });
 
-
-
-// todo UPDATE LOt manager events, delete lot events

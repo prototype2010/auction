@@ -54,6 +54,5 @@ Event.on('lot::delete', async lot => {
   await LotManager.deleteLot(lot.id);
 
   await Redis.del(lot.id, JSON.stringify(lot))
-
 });
 

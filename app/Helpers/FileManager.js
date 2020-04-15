@@ -1,4 +1,4 @@
-const { createReadStream, createWriteStream, existsSync, unlink } = require('fs');
+const { createReadStream, createWriteStream, existsSync, unlink, stat } = require('fs');
 const path = require('path');
 
 class FileManager {
@@ -10,6 +10,14 @@ class FileManager {
     }
 
     this.folderPath = resolvedPath;
+  }
+
+  async exists(fileName) {
+    return new Promise(res => {
+      stat(this.resolveFilePath(fileName), (err, stats) => {
+        res(!!stats);
+      });
+    });
   }
 
   async save(fileName, fileData) {

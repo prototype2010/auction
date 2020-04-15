@@ -26,6 +26,10 @@ class LotManager {
     return this.fileManager.delete(lotId);
   }
 
+  async lotExists(lotId) {
+    return this.fileManager.exists(lotId);
+  }
+
   fromJSON(data) {
     try {
       return JSON.parse(data);

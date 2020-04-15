@@ -44,6 +44,7 @@
     "@adonisjs/shield": "^1.0.8",
     "@adonisjs/validator": "^5.0.6",
     "@adonisjs/vow": "^1.0.17",
+    "bull": "^3.13.0",
     "faker": "^4.1.0",
     "indicative": "^7.4.4",
     "lodash": "^4.17.15",
