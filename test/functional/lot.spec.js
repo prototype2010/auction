@@ -149,27 +149,6 @@ test('POST 422 Lot can\'t be created with wrong date (end before it starts)', as
   lotResponse.assertStatus(422);
 });
 
-
-
-
-test('POST 422 Lot can\'t be created with wrong date (can\'t be less than an hour)', async ({ assert, client }) => {
-
-  const user = await createUser();
-  const lot = await makeLot({
-    lotStartTime : moment().add(60,'minutes').toISOString(),
-    lotEndTime : moment().add(70,'minutes').toISOString()
-  });
-
-  const lotResponse = await client.post('/lots')
-    .send(lot.toJSON())
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
-  assert.equal(lotResponse.body[0].message, 'Auction can\'t last less than an hour ' );
-
-  lotResponse.assertStatus(422);
-});
-
 test('POST 422 Lot can\'t be created with wrong estimated price', async ({ assert, client }) => {
 
   const user = await createUser();

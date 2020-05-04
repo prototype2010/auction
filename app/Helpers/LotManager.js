@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 class LotManager {
   constructor(fileManager) {
     this.fileManager = fileManager;

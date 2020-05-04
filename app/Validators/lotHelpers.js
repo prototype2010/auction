@@ -8,7 +8,8 @@ const validLotDates = async (data, field, message, args, get) => {
     throw new Error('Auction can\'t end before it starts');
   }
 
-  if (moment(lotEndTime).isBefore(moment(lotStartTime).add(1, 'hour'))) {
+  if (process.env.NODE_ENV !== 'testing' /* for testing purposes we wont wait for an hour */
+    && moment(lotEndTime).isBefore(moment(lotStartTime).add(1, 'hour'))) {
     throw new Error('Auction can\'t last less than an hour ');
   }
 

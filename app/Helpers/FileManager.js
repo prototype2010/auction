@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { createReadStream, createWriteStream, existsSync, unlink, stat } = require('fs');
 const path = require('path');
 
