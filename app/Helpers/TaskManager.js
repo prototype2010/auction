@@ -11,8 +11,6 @@ const LotsQueue = new Bull('lots', {
 LotsQueue.process(async job => {
   job.progress(100);
 
-  console.log('####### LOT INFO', job.data.id);
-
   return true;
 });
 
@@ -23,8 +21,5 @@ LotsQueue.on('completed', (job, result) => {
 LotsQueue.on('global:completed', jobId => {
   console.log(`Job with id ${jobId} has been completed`);
 });
-
-// LotsQueue.add({id: 25, name : 'fuck you'});
-
 
 module.exports = LotsQueue;
