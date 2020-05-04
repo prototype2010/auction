@@ -13,7 +13,7 @@ const validLotDates = async (data, field, message, args, get) => {
     throw new Error('Auction can\'t last less than an hour ');
   }
 
-  if (moment(lotStartTime).isBefore(moment().add(1, 'minute'))) { /* 1 minute as maximum processing time */
+  if (moment(lotStartTime).add(1, 'minute').isBefore(moment())) { /* 1 minute as maximum processing time */
     throw new Error('Auction can\'t be started in the past');
   }
 };

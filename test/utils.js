@@ -84,6 +84,10 @@ const getRecoveryTokenFromLastEmail = async () => {
   return recoveryToken;
 };
 
+const waitFor = async (milliseconds) => {
+  await new Promise((res) => setTimeout(res, milliseconds))
+}
+
 module.exports = {
   getDBRowsNumber,
   createUserWithParams,
@@ -93,4 +97,5 @@ module.exports = {
   getRecoveryTokenFromLastEmail,
   createUser,
   makeLot,
+  waitFor,
 };

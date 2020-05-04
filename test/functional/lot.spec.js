@@ -16,7 +16,7 @@ trait('Auth/Client');
 const path = require('path');
 const moment = require('moment');
 
-const { getUserToken, getDBRowsNumber, createUser, makeLot } = require('../utils');
+const { getUserToken, getDBRowsNumber, createUser, makeLot, waitFor } = require('../utils');
 
 test('Lot can be created', async ({ assert, client }) => {
   const lotsAmountBefore = await getDBRowsNumber(Lot);
@@ -582,5 +582,29 @@ test('Lot manager deletes lots correctly', async ({ assert, client }) => {
   const filePath = `${LotManager.fileManager.folderPath}/${body.id}`;
 
   assert.isNotOk(fs.existsSync(filePath),'File should not exist')
+});
+
+test('Lot becomes active', async ({ assert, client }) => {
+
+  const user = await createUser();
+  const lot = await makeLot({
+    lotStartTime : moment(),
+    lotEndTime : moment().add(1,'seconds'),
+  })
+
+  const {body} = await client.post('/lots')
+    .send(lot.toJSON())
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+
+  await waitFor(500)
+
+  const activeLot = await client.get(`/lots/${body.id}`)
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+  assert.equal(activeLot.body.status,'inProcess');
+
 });
 
