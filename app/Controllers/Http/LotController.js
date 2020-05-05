@@ -197,6 +197,14 @@ class LotController {
     }
   }
 
+  async myLots({auth, response}) {
+
+    const user = await auth.getUser();
+    const lots = await user.lots().fetch();
+
+    return response.status(200).send(lots);
+  }
+
 
 }
 

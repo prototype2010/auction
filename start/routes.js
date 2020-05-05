@@ -30,6 +30,8 @@ Route.resource('users', 'UserController')
   .only(['show', 'update'])
   .middleware('auth');
 
+Route.get('lots/my', 'LotController.myLots').middleware('auth');
+
 Route.resource('lots', 'LotController')
   .validator(new Map([[['lots.store'], ['LotStore']]]))
   .middleware('auth');

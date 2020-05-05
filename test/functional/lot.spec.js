@@ -626,7 +626,7 @@ test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
   assert.equal(gottenById.status, 403);
 });
 
-test('Lot inProcess lot cannot be updated', async ({ assert, client }) => {
+test('PUT 403 Lot inProcess lot cannot be updated', async ({ assert, client }) => {
   const user = await createUser();
   const lot = await makeLot({
     lotStartTime: moment().toISOString(),
@@ -652,4 +652,24 @@ test('Lot inProcess lot cannot be updated', async ({ assert, client }) => {
 
 
   assert.equal(deleteAttempt.status, 403);
+});
+
+test('GET 200 My lost works fine', async ({ assert, client }) => {
+  const user = await createUser();
+  const lot = await makeLot({
+    lotStartTime: moment().toISOString(),
+    lotEndTime: moment().add(1, 'hours').toISOString(),
+  });
+
+  const lotResponse = await client.post('/lots')
+    .send(lot.toJSON())
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+  const myLots = await client.get(`/lots/my`)
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+  assert.equal(myLots.body.some(lot => lot.id === lotResponse.body.id), true)
+  assert.equal(myLots.body.every(lot => lot.user_id === user.id), true)
 });
