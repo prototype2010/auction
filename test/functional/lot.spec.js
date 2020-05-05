@@ -670,8 +670,8 @@ test('GET 200 My lost works fine', async ({ assert, client }) => {
     .loginVia(user.toJSON(), 'jwt')
     .end();
 
-  assert.equal(myLots.body.some(lot => lot.id === lotResponse.body.id), true)
-  assert.equal(myLots.body.every(lot => lot.user_id === user.id), true)
+  assert.equal(myLots.body.data.some(lot => lot.id === lotResponse.body.id), true)
+  assert.equal(myLots.body.data.every(lot => lot.user_id === user.id), true)
 });
 
 test('GET 200 all lots are not in pending status', async ({ assert, client }) => {
@@ -681,7 +681,7 @@ test('GET 200 all lots are not in pending status', async ({ assert, client }) =>
     .loginVia(user.toJSON(), 'jwt')
     .end();
 
-  assert.equal(allLots.body.every(lot => {
+  assert.equal(allLots.body.data.every(lot => {
     return lot.status !== 'pending';
   }), true)
 });

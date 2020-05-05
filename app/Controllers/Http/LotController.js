@@ -6,11 +6,13 @@ const Event = use('Event');
 
 class LotController {
 
-  async index() {
-    const all = await Lot.query()
-      .where('status', '!=', 'pending')
-      .fetch();
+  async index({request}) {
 
+    const page = request.get().page || 1
+    const all = await Lot
+      .query()
+      .where('status', '!=', 'pending')
+      .paginate(page)
     return all;
   }
 
@@ -199,15 +201,18 @@ class LotController {
     }
   }
 
-  async myLots({auth, response}) {
+  async myLots({auth, response, request}) {
 
+    const page = request.get().page || 1
     const user = await auth.getUser();
-    const lots = await user.lots().fetch();
+
+    const lots = await Lot
+      .query()
+      .where('user_id', '=', user.id)
+      .paginate(page)
 
     return response.status(200).send(lots);
   }
-
-
 }
 
 module.exports = LotController;
