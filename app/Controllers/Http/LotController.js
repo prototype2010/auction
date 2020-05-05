@@ -7,7 +7,9 @@ const Event = use('Event');
 class LotController {
 
   async index() {
-    const all = await Lot.all();
+    const all = await Lot.query()
+      .where('status', '!=', 'pending')
+      .fetch();
 
     return all;
   }
