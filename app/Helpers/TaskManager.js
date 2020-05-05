@@ -2,6 +2,7 @@
 const Bull = require('bull');
 const moment = require('moment');
 const Lot = use('App/Models/Lot');
+const LotManager = use('LotManager');
 const TimeUtils = use('TimeUtils');
 
 const Event = use('Event');
@@ -33,11 +34,17 @@ NewLotsQueue.process(async job => {
   }
 
   job.progress(100);
+
   return true;
 });
 
-NewLotsQueue.on('completed', job => {
-  // Event.fire('lot::delete', job.data); // TODO probably WS event here
+NewLotsQueue.on('completed', async job => {
+
+  const lot = await Lot.find(job.data.id);
+
+  if(lot && lot.status === 'inProcess') {
+    LotManager.deleteLot(lot.id)
+  }
 });
 
 
