@@ -5,8 +5,7 @@ const APP_EMAIL = Env.get('MAIL_USERNAME');
 const Redis = use('Redis');
 const LotManager = use('LotManager');
 const { NewLotsQueue } = use('TaskManager');
-
-const moment = require('moment');
+const { getDiffMillisecondsFromNow } = use('TimeUtils');
 
 
 Event.on('user::new', async user => {
@@ -40,12 +39,6 @@ Event.on('user::passwordLost', async user => {
   );
 });
 
-const defineLotStartDelay = lot => {
-  const delay = moment(lot.lotStartTime).diff(moment(), 'milliseconds');
-
-  return delay < 0 ? 0 : delay;
-};
-
 
 Event.on('lot::new', async lot => {
   await LotManager.saveLot(lot);
@@ -54,7 +47,7 @@ Event.on('lot::new', async lot => {
 
   await Redis.set(lot.id, serializedLot);
 
-  const lotTaskDelay = defineLotStartDelay(serializedLot);
+  const lotTaskDelay = getDiffMillisecondsFromNow(serializedLot.lotStartTime);
 
   NewLotsQueue.add(serializedLot, { delay: lotTaskDelay });
 });

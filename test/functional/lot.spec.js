@@ -605,6 +605,37 @@ test('Lot becomes active', async ({ assert, client }) => {
     .end();
 
   assert.equal(activeLot.body.status,'inProcess');
+});
 
+
+test('Lot with updated time didn\'t become active', async ({ assert, client }) => {
+
+  const user = await createUser();
+
+  const lot = await makeLot({
+    lotStartTime : moment().add(5,'seconds').toISOString(),
+    lotEndTime : moment().add(1,'hours').toISOString(),
+  })
+
+  const {body} = await client.post('/lots')
+    .send(lot.toJSON())
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+  await waitFor(3000)
+
+  await client.put(`/lots/${body.id}`)
+    .send({...lot.toJSON(),
+      lotStartTime : moment().add(1,'hours'),
+      lotEndTime : moment().add(1,'day'),})
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+
+  const activeLot = await client.get(`/lots/${body.id}`)
+    .loginVia(user.toJSON(), 'jwt')
+    .end();
+
+  assert.equal(activeLot.body.status,'pending');
 });
 
