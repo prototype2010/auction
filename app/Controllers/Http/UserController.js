@@ -134,7 +134,9 @@ class UserController {
   async logout({ auth, response }) {
     const user = await auth.getUser();
 
-    await auth.authenticator('jwt').revokeTokensForUser(user);
+    await auth
+      .authenticator('jwt')
+      .revokeTokensForUser(user);
 
     response.status(200).send({ message: 'Logged out successfully' });
   }
