@@ -93,9 +93,7 @@ class UserController {
     const authUser = await auth.getUser();
 
     if (authUser.id !== parseInt(id, 10)) {
-      response.status(403);
-
-      response.send({
+      response.status(403).send({
         status: 403,
         message: "You can't update someone's info",
       });

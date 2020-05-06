@@ -27,8 +27,7 @@ class AuthController {
 
     await auth.authenticator('jwt').revokeTokensForUser(user);
 
-    response.status(200);
-    response.send({ message: 'Logged out successfully' });
+    response.status(200).send({ message: 'Logged out successfully' });
   }
 
   async passwordRecovery({ request, response }) {
@@ -44,11 +43,9 @@ class AuthController {
 
       Event.fire('user::passwordLost', user);
 
-      response.status(200);
-      response.send({ message: 'ok' });
+      response.status(200).send({ message: 'ok' });
     } else {
-      response.status(404);
-      response.send({ message: 'User not found' });
+      response.status(404).send({ message: 'User not found' });
     }
   }
 
@@ -70,11 +67,9 @@ class AuthController {
 
       Event.fire('user::passwordChanged', { ...user.toJSON(), password });
 
-      response.status(200);
-      response.send({ message: 'Password changed successfully' });
+      response.status(200).send({ message: 'Password changed successfully' });
     } else {
-      response.status(404);
-      response.send({ message: 'Invalid token' });
+      response.status(404).send({ message: 'Invalid token' });
     }
   }
 }
