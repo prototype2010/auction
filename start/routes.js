@@ -17,11 +17,11 @@
 const Route = use('Route');
 
 Route.group(() => {
-  Route.post('login', 'AuthController.login');
-  Route.post('logout', 'AuthController.logout');
-  Route.post('refresh', 'AuthController.refresh');
-  Route.post('password-recovery', 'AuthController.passwordRecovery');
-  Route.get('password-recovery/:token', 'AuthController.applyPasswordRecovery');
+  Route.post('login', 'UserController.login');
+  Route.post('logout', 'UserController.logout');
+  Route.post('refresh', 'UserController.refresh');
+  Route.post('password-recovery', 'UserController.passwordRecovery');
+  Route.get('password-recovery/:token', 'UserController.applyPasswordRecovery');
 }).prefix('users/auth');
 
 Route.post('users', 'UserController.store').validator('UserStore');
