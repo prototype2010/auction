@@ -93,14 +93,14 @@ class UserController {
       });
     }
 
-    authUser.email = email;
-    authUser.password = password;
-    authUser.firstname = firstname;
-    authUser.lastname = lastname;
-    authUser.phone = phone;
-    authUser.birthday = birthday;
-
-    await authUser.save();
+    await authUser.merge({
+      email,
+      password,
+      firstname,
+      lastname,
+      phone,
+      birthday,
+    });
 
     return authUser;
   }
