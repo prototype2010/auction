@@ -30,7 +30,7 @@ const createUserWithParams = async (client, overrideParams = {}) => {
 
   const response = await client
     .post('/users')
-    .send({ ...fakeUser, ...overrideParams })
+    .send({ ...fakeUser, repeatPassword: fakeUser.password, ...overrideParams })
     .end();
 
   return response;
