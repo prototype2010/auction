@@ -18,7 +18,8 @@ test('POST users.auth (200) User can receive token', async ({
   assert,
 }) => {
   const password = 'XXXXXXXXXX';
-  const createdUserResponse = await createUserWithParams(client, { password });
+  const createdUserResponse = await createUserWithParams(client,
+    { password, repeatPassword: password });
   const { body: user } = createdUserResponse;
 
   const authAttempt = await client

@@ -18,6 +18,12 @@ test('POST user.store (200). User can be created', async ({ client }) => {
   response.assertStatus(200);
 });
 
+test('POST user.store (422). User cannot be created if passwords don\'t match ', async ({ client }) => {
+  const response = await createUserWithParams(client, {repeatPassword : 'something very different'});
+
+  response.assertStatus(422);
+});
+
 test('POST user.store (200). 1 user is being created', async ({
   client,
   assert,

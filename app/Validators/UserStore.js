@@ -7,7 +7,7 @@ class UserStore extends BaseValidator {
     return {
       email: 'required|email|unique:users',
       password: 'required',
-      repeatPassword: 'required',
+      repeatPassword: 'required|passwordsMatch',
       firstname: 'required',
       lastname: 'required',
       phone: 'required|unique:users',

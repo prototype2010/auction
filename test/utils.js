@@ -28,9 +28,11 @@ const makeLot = async (overrideParams = {}) => {
 const createUserWithParams = async (client, overrideParams = {}) => {
   const fakeUser = await Factory.get('App/Models/User').make();
 
+  const params = { ...fakeUser, repeatPassword: fakeUser.password, ...overrideParams }
+
   const response = await client
     .post('/users')
-    .send({ ...fakeUser, repeatPassword: fakeUser.password, ...overrideParams })
+    .send(params)
     .end();
 
   return response;
@@ -44,7 +46,7 @@ const getDBRowsNumber = async (entity) => {
 const getUserToken = async client => {
   const password = faker.internet.password();
 
-  const { body: user } = await createUserWithParams(client, { password });
+  const { body: user } = await createUserWithParams(client, { password, repeatPassword: password });
 
   const response = await client
     .post('/users/auth/login')
