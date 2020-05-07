@@ -49,19 +49,10 @@ class UserController {
    * @param {View} ctx.view
    */
 
-  async show({ params, auth, response }) {
-    const { id } = params;
-
+  async profile({ auth }) {
     const authUser = await auth.getUser();
 
-    if (authUser.id !== parseInt(id, 10)) {
-      return response.send({
-        status: 403,
-        message: "You can't see someone's info",
-      });
-    }
-
-    const user = await User.find(id);
+    const user = await User.find(authUser.id);
 
     return user;
   }

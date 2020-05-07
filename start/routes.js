@@ -25,9 +25,10 @@ Route.group(() => {
 }).prefix('users/auth');
 
 Route.post('users', 'UserController.store').validator('UserStore');
+Route.get('users/profile', 'UserController.profile').middleware('auth');
 //
 Route.resource('users', 'UserController')
-  .only(['show', 'update'])
+  .only(['update'])
   .middleware('auth');
 
 Route.get('lots/my', 'LotController.myLots').middleware('auth');

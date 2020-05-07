@@ -85,3 +85,20 @@ test("PUT users.update (403) User updates some one's info", async ({
 
   response.assertStatus(403);
 });
+
+test("GET users.profile (200) User updates some one's info", async ({
+  client,assert
+}) => {
+  const response = await createUserWithParams(client, {
+    birthday: moment().subtract(30,'years').toISOString(),
+  });
+
+  const profile = await client.get(`/users/profile`)
+    .loginVia(response.body, 'jwt')
+    .end();
+
+  profile.assertStatus(200);
+
+  assert.deepEqual(response.body.id,profile.body.id);
+
+});
