@@ -65,16 +65,6 @@ const getRecentEmail = async () => {
   return Mail.recent();
 };
 
-const getPasswordFromLastEmail = async () => {
-  const lastEmail = await getRecentEmail();
-
-  const [, newPassword] = lastEmail.message.html.match(
-    /New password : ([a-zA-Z0-9]*)/,
-  );
-
-  return newPassword;
-};
-
 /* eslint-disable */
 const getRecoveryTokenFromLastEmail = async () => {
   const lastEmail = await getRecentEmail();
@@ -95,7 +85,6 @@ module.exports = {
   createUserWithParams,
   getUserToken,
   getRecentEmail,
-  getPasswordFromLastEmail,
   getRecoveryTokenFromLastEmail,
   createUser,
   makeLot,

@@ -140,7 +140,6 @@ class UserController {
     if (user) {
       user.passwordRecoveryToken = uid(32);
       user.tokenExpirationDate = moment().add(24, 'hours');
-      user.isTokenUsed = false;
       await user.save();
 
       Event.fire('user::passwordLost', user);
@@ -151,23 +150,23 @@ class UserController {
     }
   }
 
-  async applyPasswordRecovery({ response, params }) {
+  async applyPasswordRecovery({ response, params, request }) {
     const { token } = params;
 
-    const user = await User.findBy({
-      passwordRecoveryToken: token,
-      isTokenUsed: false,
-    });
+    const { password } = request.only([
+      'password',
+    ]);
+
+
+    const user = await User.findBy({ passwordRecoveryToken: token });
 
     if (user && moment().isBefore(moment(user.tokenExpirationDate))) {
-      const password = uid(16);
-
       user.password = password;
-      user.isTokenUsed = true;
+      user.passwordRecoveryToken = null;
 
       await user.save();
 
-      Event.fire('user::passwordChanged', { ...user.toJSON(), password });
+      Event.fire('user::passwordChanged', { ...user.toJSON() });
 
       response.status(200).send({ message: 'Password changed successfully' });
     } else {

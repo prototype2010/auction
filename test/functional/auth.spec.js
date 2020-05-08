@@ -9,7 +9,6 @@ const {
   createUserWithParams,
   getUserToken,
   getRecentEmail,
-  getPasswordFromLastEmail,
   getRecoveryTokenFromLastEmail,
 } = require('../utils');
 
@@ -291,7 +290,7 @@ test('GET password-recovery (200) Recovery code gives correct response', async (
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
   const response = await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
     .end();
 
   response.assertStatus(200);
@@ -315,7 +314,7 @@ test('POST users/auth/login Correct event will be fired', async ({
   Event.fake();
 
   await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
     .end();
 
   const { data: userDataArray, event } = Event.recent();
@@ -337,11 +336,16 @@ test('POST users/auth/password-recovery (200) Password after recovery works fine
 
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
+  const newPassword = 'im new password';
+
   await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({
+      email,
+      password: newPassword,
+    })
     .end();
 
-  const newPassword = await getPasswordFromLastEmail();
 
   const response = await client
     .post('/users/auth/login')
@@ -379,13 +383,16 @@ test('POST users/auth/password-recovery (200) Protected data can be reached', as
     .send({ email })
     .end();
 
+
+  const newPassword = 'im new password';
+
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
   await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({ email, password: newPassword })
     .end();
 
-  const newPassword = await getPasswordFromLastEmail();
 
   const response = await client
     .post('/users/auth/login')
