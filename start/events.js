@@ -1,7 +1,7 @@
 const Env = use('Env');
 const Event = use('Event');
 const Mail = use('Mail');
-const APP_EMAIL = Env.get('MAIL_USERNAME');
+const APP_EMAIL = Env.get('SUPPORT_MAIL');
 const Redis = use('Redis');
 const LotManager = use('LotManager');
 const { NewLotsQueue } = use('TaskManager');

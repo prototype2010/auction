@@ -29,7 +29,7 @@ module.exports = {
     host: Env.get('SMTP_HOST'),
     secure: false,
     auth: {
-      user: Env.get('MAIL_USERNAME'),
+      user: Env.get('SUPPORT_MAIL'),
       pass: Env.get('MAIL_PASSWORD'),
     },
     maxConnections: 5,
