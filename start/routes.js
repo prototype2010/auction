@@ -20,7 +20,7 @@ Route.group(() => {
   Route.post('login', 'UserController.login');
   Route.post('logout', 'UserController.logout');
   Route.post('refresh', 'UserController.refresh');
-  Route.post('password-recovery', 'UserController.passwordRecovery');
+  Route.post('password-recovery', 'UserController.initiatePasswordReset');
   Route.get('password-recovery/:token', 'UserController.applyPasswordRecovery');
 }).prefix('users/auth');
 

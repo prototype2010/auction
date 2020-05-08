@@ -28,7 +28,7 @@ Event.on('user::passwordChanged', async user => {
 
 Event.on('user::passwordLost', async user => {
   await Mail.send(
-    'emails.passwordRecovery',
+    'emails.initiatePasswordReset',
     { ...user.toJSON(), passwordRecoveryToken: user.passwordRecoveryToken },
     message => {
       message

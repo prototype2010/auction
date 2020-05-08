@@ -132,7 +132,7 @@ class UserController {
     response.status(200).send({ message: 'Logged out successfully' });
   }
 
-  async passwordRecovery({ request, response }) {
+  async initiatePasswordReset({ request, response }) {
     const { email } = request.only(['email']);
 
     const user = await User.findBy('email', email);
