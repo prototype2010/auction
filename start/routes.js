@@ -21,7 +21,7 @@ Route.group(() => {
   Route.post('logout', 'UserController.logout');
   Route.post('refresh', 'UserController.refresh');
   Route.post('password-recovery', 'UserController.initiatePasswordReset');
-  Route.post('password-recovery/:token', 'UserController.applyPasswordRecovery');
+  Route.post('password-recovery/:token', 'UserController.applyPasswordRecovery').validator('PasswordUpdate');
 }).prefix('users/auth');
 
 Route.post('users', 'UserController.store').validator('UserStore');

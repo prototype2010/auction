@@ -289,8 +289,11 @@ test('GET password-recovery (200) Recovery code gives correct response', async (
 
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
+  const password = 'im new password';
+
   const response = await client
     .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({ email, password, repeatPassword: password })
     .end();
 
   response.assertStatus(200);
