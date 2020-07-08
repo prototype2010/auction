@@ -182,12 +182,10 @@ class LotController {
     const page = request.get().page || 1
     const user = await auth.getUser();
 
-    const lots = await Lot
+    return await Lot
       .query()
       .where('user_id', '=', user.id)
       .paginate(page)
-
-    return response.status(200).send(lots);
   }
 }
 
