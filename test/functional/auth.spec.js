@@ -252,7 +252,8 @@ test('Event will be fired for correct user', async ({ client, assert }) => {
   Event.restore();
 });
 
-test('Email contains recovery code', async ({ client, assert }) => {
+
+test('Email contains recovery url', async ({ client, assert }) => {
   const { body: user } = await createUserWithParams(client);
   const { email } = user;
 
@@ -265,14 +266,27 @@ test('Email contains recovery code', async ({ client, assert }) => {
 
   const lastEmail = await getRecentEmail();
 
-  const recoveryToken = await getRecoveryTokenFromLastEmail();
-
   assert.isTrue(
     lastEmail.message.html.includes(
       `users/auth/lost-password/${passwordRecoveryToken}`,
     ),
   );
-  assert.equal(recoveryToken, passwordRecoveryToken); // this should be the same
+});
+
+test('Email recovery token matches', async ({ client, assert }) => {
+  const { body: user } = await createUserWithParams(client);
+  const { email } = user;
+
+  await client
+    .post('/users/auth/password-recovery')
+    .send({ email })
+    .end();
+
+  const { passwordRecoveryToken } = await User.findBy('email', email);
+
+  const recoveryToken = await getRecoveryTokenFromLastEmail();
+
+  assert.equal(recoveryToken, passwordRecoveryToken);
 });
 
 test('GET password-recovery (200) Recovery code gives correct response', async ({
