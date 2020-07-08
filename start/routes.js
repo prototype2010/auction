@@ -26,7 +26,7 @@ Route.group(() => {
 
 Route.post('users', 'UserController.store').validator('UserStore');
 Route.get('users/profile', 'UserController.profile').middleware('auth');
-//
+
 Route.resource('users', 'UserController')
   .only(['update'])
   .middleware('auth');
