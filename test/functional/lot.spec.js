@@ -308,8 +308,6 @@ test('DELETE 404 User can delete only own lots', async ({ assert, client }) => {
     .loginVia(unathorizedUser.toJSON(), 'jwt')
     .end();
 
-  assert.equal(response.body.message, 'Lot not found');
-
   response.assertStatus(404);
 });
 

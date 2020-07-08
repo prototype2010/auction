@@ -162,18 +162,12 @@ class LotController {
   async destroy ({ params, auth, response }) {
     const { id : userId} = await auth.getUser();
 
-    const lot = await Lot.findBy({
+    const lot = await Lot.findByOrFail({
       user_id: userId,
       id: params.id,
     });
 
-    if(! lot ) {
-      response
-        .status(404)
-        .send({
-          message: `Lot not found`
-        });
-    } else if(lot.status !== 'pending' ) {
+    if(lot.status !== 'pending' ) {
       response
         .status(403)
         .send({
