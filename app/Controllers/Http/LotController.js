@@ -9,11 +9,10 @@ class LotController {
   async index({request}) {
 
     const page = request.get().page || 1
-    const all = await Lot
+    return Lot
       .query()
       .where('status', '!=', 'pending')
-      .paginate(page)
-    return all;
+      .paginate(page);
   }
 
   async store({ request, response, auth }) {
@@ -70,18 +69,10 @@ class LotController {
 
     const authUser = await auth.getUser();
 
-    const lot = await Lot.findBy({
+    return Lot.findBy({
       id,
       user_id: authUser.id
     });
-
-    if(lot) {
-      return lot;
-    } else {
-      response.status(404).send({
-        message: 'Lot not found'
-      });
-    }
   }
 
 
