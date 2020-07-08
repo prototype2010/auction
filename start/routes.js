@@ -38,5 +38,8 @@ Route.resource('lots', 'LotController')
   .middleware('auth');
 
 Route.resource('bids', 'BidController')
-  .validator(new Map([[['lots.store'], ['LotStore']]]))
+  .validator(new Map([
+    [['bids.store'], ['BidStore']],
+    [['bids.update'], ['BidStore']],
+  ]))
   .middleware('auth');

@@ -5,9 +5,13 @@ hooks.after.providersBooted(() => {
   const { allowedAge } = use('App/Validators/AllowedAge');
   const { validLotPrices, validLotDates } = use('App/Validators/lotHelpers');
   const { passwordsMatch } = use('App/Validators/passwordsMatch');
+  const { lotExists, validBidPrice, lotInProcess } = use('App/Validators/bidHelpers');
 
   Validator.extend('allowedAge', allowedAge);
   Validator.extend('validLotPrices', validLotPrices);
   Validator.extend('validLotDates', validLotDates);
   Validator.extend('passwordsMatch', passwordsMatch);
+  Validator.extend('lotExists', lotExists);
+  Validator.extend('lotInProcess', lotInProcess);
+  Validator.extend('validBidPrice', validBidPrice);
 });

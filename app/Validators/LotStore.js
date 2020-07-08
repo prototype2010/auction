@@ -4,6 +4,8 @@ const { BaseValidator } = require('./BaseValidator');
 
 class LotStore extends BaseValidator {
   get rules() {
+    // console.log("######", this.context.params)
+
     return {
       title: 'required',
       description: 'string',

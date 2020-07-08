@@ -1,5 +1,6 @@
 
 const Bid = use('App/Models/Bid');
+const Lot = use('App/Models/Lot');
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -63,15 +64,21 @@ class BidController {
 
     return bid;
   }
-  /**
-   * Delete a bid with id.
-   * DELETE bids/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  // async destroy ({ params, request, response }) {}
+
+  async destroy({ params, auth, response }) {
+    const { id: userId } = await auth.getUser();
+    const { id: bidId } = params;
+
+    const bid = await Bid.findOrFail({ user_id: userId, id: bidId });
+
+    const lot = await Lot.findOrFail({ id: bid.lot_id });
+
+    if (lot.status !== 'inProcess') {
+      response.status(403).send({ message: 'Only bid for lot with "inProcess" status can be deleted' });
+    } else {
+      return bid.delete();
+    }
+  }
 }
 
 module.exports = BidController;
