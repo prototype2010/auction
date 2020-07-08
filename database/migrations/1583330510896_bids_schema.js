@@ -20,7 +20,6 @@ class BidsSchema extends Schema {
         .references('id')
         .inTable('lots')
         .onDelete('CASCADE');
-      table.datetime('creationTime').notNullable();
       table.timestamps();
     });
   }
