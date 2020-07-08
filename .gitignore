@@ -9,9 +9,6 @@ tmp
 .env*
 !.env.example
 
-# The development sqlite file
-database/*.sqlite
-
 # VSCode & Webstorm history directories
 .history
 .idea
