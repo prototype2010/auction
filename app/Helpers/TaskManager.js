@@ -4,8 +4,6 @@ const moment = require('moment');
 const Lot = use('App/Models/Lot');
 const TimeUtils = use('TimeUtils');
 
-const Event = use('Event');
-
 const NewLotsQueue = new Bull('lots', {
   limiter: {
     max: 100,
@@ -18,16 +16,11 @@ NewLotsQueue.process(async job => {
   const { data } = job
 
   const lot = await Lot.find(data.id);
-  // const startTime = lot.lotStartTime;
 
-  if(!lot) {
-    // lot deleted cancel task // todo maybe delete backup files
-  } else if(lot && (moment().isAfter(lot.lotStartTime) || moment().isSame(moment(lot.lotStartTime)) )) {
-    // make active
+  if(lot && (moment().isAfter(lot.lotStartTime) || moment().isSame(moment(lot.lotStartTime)) )) {
     lot.status = 'inProcess';
     await lot.save();
   } else if(lot && moment(lot.lotStartTime).isAfter(moment())) {
-    // create new task
     const newTaskDelay = TimeUtils.getDiffMillisecondsFromNow(lot.lotStartTime)
     NewLotsQueue.add(lot, { delay: newTaskDelay });
   }
