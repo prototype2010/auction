@@ -39,17 +39,30 @@ class BidController {
 
     return bid;
   }
-  /**
-   * Display a single bid.
-   * GET bids/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  // async show ({ params, request, response, view }) {}
-  // async update ({ params, request, response }) {}
+
+  async show({ params }) {
+    const { id } = params;
+
+    return Bid.findByOrFail({ id });
+  }
+
+  async update({ params, request, auth }) {
+    const { proposedPrice } = request.only([
+      'lodId',
+      'proposedPrice',
+    ]);
+
+    const { id: userId } = await auth.getUser();
+    const { id: bidId } = params;
+
+    const bid = Bid.findBy({ id: bidId, user_id: userId });
+
+    bid.proposedPrice = proposedPrice;
+
+    bid.save();
+
+    return bid;
+  }
   /**
    * Delete a bid with id.
    * DELETE bids/:id
