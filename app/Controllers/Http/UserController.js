@@ -166,7 +166,7 @@ class UserController {
 
       await user.save();
 
-      Event.fire('user::passwordChanged', { ...user.toJSON() });
+      await Event.fire('user::passwordChanged', user);
 
       response.status(200).send({ message: 'Password changed successfully' });
     } else {

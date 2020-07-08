@@ -316,8 +316,15 @@ test('POST users/auth/login Correct event will be fired', async ({
 
   Event.fake();
 
+  const newPassword = 'newPassword$$$';
+
   await client
     .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({
+      email,
+      password: newPassword,
+      repeatPassword: newPassword,
+    })
     .end();
 
   const { data: userDataArray, event } = Event.recent();
@@ -326,7 +333,7 @@ test('POST users/auth/login Correct event will be fired', async ({
   assert.equal(userDataArray[0].email, user.email);
 
   Event.restore();
-});
+}).timeout(0);
 
 test('POST users/auth/password-recovery (200) Password after recovery works fine', async ({ client }) => {
   const { body: user } = await createUserWithParams(client);
@@ -346,9 +353,9 @@ test('POST users/auth/password-recovery (200) Password after recovery works fine
     .send({
       email,
       password: newPassword,
+      repeatPassword: newPassword,
     })
     .end();
-
 
   const response = await client
     .post('/users/auth/login')
@@ -359,7 +366,7 @@ test('POST users/auth/password-recovery (200) Password after recovery works fine
     .end();
 
   response.assertStatus(200);
-});
+}).timeout(0);
 
 test('POST users/auth/password-recovery (404) Incorrect token returns error', async ({ client }) => {
   const { body: user } = await createUserWithParams(client);
@@ -393,7 +400,7 @@ test('POST users/auth/password-recovery (200) Protected data can be reached', as
 
   await client
     .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
-    .send({ email, password: newPassword })
+    .send({ email, password: newPassword, repeatPassword: newPassword })
     .end();
 
 
@@ -413,4 +420,4 @@ test('POST users/auth/password-recovery (200) Protected data can be reached', as
     .end();
 
   protectedRouteResponse.assertStatus(200);
-});
+}).timeout(0);
