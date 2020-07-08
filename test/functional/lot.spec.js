@@ -361,15 +361,12 @@ test('PUT 404 Lot can be updated only by its owner', async ({ assert, client }) 
     .loginVia(user.toJSON(), 'jwt')
     .end();
 
-
   const newTitle = 'I AM NEW TITLE';
 
   const lotResponse = await client.put(`/lots/${newLotResponse.body.id}`)
     .send({ ...lot.toJSON(), title: newTitle })
     .loginVia(unathorizedUser.toJSON(), 'jwt')
     .end();
-
-  assert.equal(lotResponse.body.message, 'Lot not found');
 
   lotResponse.assertStatus(404);
 });
@@ -394,8 +391,6 @@ test('PUT 403 Only pending lots can be updated', async ({ assert, client }) => {
     .send({ ...lot.toJSON(), title: newTitle })
     .loginVia(user.toJSON(), 'jwt')
     .end();
-
-  assert.equal(lotResponse.body.message, 'Only lots in "pending status" can be updated');
 
   lotResponse.assertStatus(403);
 });

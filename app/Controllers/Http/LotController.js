@@ -104,12 +104,12 @@ class LotController {
 
     const { id : userId} = await auth.getUser();
 
-    const lot = await Lot.findBy({
+    const lot = await Lot.findByOrFail({
       user_id: userId,
       id: params.id,
     });
 
-    if(lot && lot.status === 'pending') {
+    if(lot.status === 'pending') {
 
       lot.image = await this.saveImageIfAttached(request);
       lot.status = 'pending';
@@ -126,21 +126,12 @@ class LotController {
 
       return lot;
 
-
-    } else if (lot && lot.status !== 'pending') {
+    } else if (lot.status !== 'pending') {
       response
         .status(403)
         .send({
         message: `Only lots in "pending status" can be updated`
       });
-
-
-    } else {
-      response
-        .status(404)
-        .send({
-          message: `Lot not found`
-        });
     }
   }
 
