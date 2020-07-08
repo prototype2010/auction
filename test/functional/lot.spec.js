@@ -561,7 +561,7 @@ test('Lot becomes active', async ({ assert, client }) => {
     .end();
 
 
-  await waitFor(500);
+  await waitFor(100);
 
   const activeLot = await client.get(`/lots/${body.id}`)
     .loginVia(user.toJSON(), 'jwt')
@@ -584,7 +584,7 @@ test('Lot with updated time didn\'t become active', async ({ assert, client }) =
     .loginVia(user.toJSON(), 'jwt')
     .end();
 
-  await waitFor(3000);
+  await waitFor(100);
 
   await client.put(`/lots/${body.id}`)
     .send({
@@ -616,7 +616,7 @@ test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
     .end();
 
 
-  await waitFor(500);
+  await waitFor(100);
 
   const gottenById = await client.delete(`/lots/${lotResponse.body.id}`)
     .loginVia(user.toJSON(), 'jwt')
@@ -639,7 +639,7 @@ test('PUT 403 Lot inProcess lot cannot be updated', async ({ assert, client }) =
     .end();
 
 
-  await waitFor(500);
+  await waitFor(100);
 
   const deleteAttempt = await client.put(`/lots/${lotResponse.body.id}`)
     .send({

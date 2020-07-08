@@ -135,19 +135,15 @@ class UserController {
   async initiatePasswordReset({ request, response }) {
     const { email } = request.only(['email']);
 
-    const user = await User.findBy('email', email);
+    const user = await User.findByOrFail('email', email);
 
-    if (user) {
-      user.passwordRecoveryToken = uid(32);
-      user.tokenExpirationDate = moment().add(24, 'hours');
-      await user.save();
+    user.passwordRecoveryToken = uid(32);
+    user.tokenExpirationDate = moment().add(24, 'hours');
+    await user.save();
 
-      Event.fire('user::passwordLost', user);
+    Event.fire('user::passwordLost', user);
 
-      response.status(200).send({ message: 'ok' });
-    } else {
-      response.status(404).send({ message: 'User not found' });
-    }
+    response.status(200).send({ message: 'ok' });
   }
 
   async applyPasswordRecovery({ response, params, request }) {
@@ -158,9 +154,9 @@ class UserController {
     ]);
 
 
-    const user = await User.findBy({ passwordRecoveryToken: token });
+    const user = await User.findByOrFail({ passwordRecoveryToken: token });
 
-    if (user && moment().isBefore(moment(user.tokenExpirationDate))) {
+    if (moment().isBefore(moment(user.tokenExpirationDate))) {
       user.password = password;
       user.passwordRecoveryToken = null;
 
@@ -168,9 +164,7 @@ class UserController {
 
       await Event.fire('user::passwordChanged', user);
 
-      response.status(200).send({ message: 'Password changed successfully' });
-    } else {
-      response.status(404).send({ message: 'Invalid token' });
+      response.send({ message: 'Password changed successfully' });
     }
   }
 }

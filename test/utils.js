@@ -30,12 +30,10 @@ const createUserWithParams = async (client, overrideParams = {}) => {
 
   const params = { ...fakeUser, repeatPassword: fakeUser.password, ...overrideParams }
 
-  const response = await client
+  return client
     .post('/users')
     .send(params)
     .end();
-
-  return response;
 };
 
 const getDBRowsNumber = async (entity) => {
@@ -48,15 +46,13 @@ const getUserToken = async client => {
 
   const { body: user } = await createUserWithParams(client, { password, repeatPassword: password });
 
-  const response = await client
+  return client
     .post('/users/auth/login')
     .send({
       email: user.email,
       password,
     })
     .end();
-
-  return response;
 };
 
 const getRecentEmail = async () => {
