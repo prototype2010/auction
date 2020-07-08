@@ -5,7 +5,7 @@ const Schema = use('Schema');
 
 class OrderSchema extends Schema {
   up() {
-    this.create('orders', table => {
+    this.create('orders', (table) => {
       table.increments();
       table.text('arrivalLocation').notNullable();
       table.enu('arrivalType', [

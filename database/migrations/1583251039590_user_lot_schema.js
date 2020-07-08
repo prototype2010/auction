@@ -5,7 +5,7 @@ const Schema = use('Schema');
 
 class UserLotSchema extends Schema {
   up() {
-    this.table('lots', table => {
+    this.table('lots', (table) => {
       table
         .integer('user_id')
         .notNullable()
@@ -16,7 +16,7 @@ class UserLotSchema extends Schema {
   }
 
   down() {
-    this.table('lots', table => {
+    this.table('lots', (table) => {
       table.dropColumn('lots');
     });
   }

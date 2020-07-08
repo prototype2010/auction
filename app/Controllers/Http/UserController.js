@@ -1,7 +1,5 @@
-'use strict';
-
 const User = use('App/Models/User');
-
+const Event = use('Event');
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -32,6 +30,8 @@ class UserController {
 
     const user = await User.create(params);
 
+    Event.fire('user::new', user.toJSON());
+
     return user;
   }
 
@@ -45,9 +45,17 @@ class UserController {
    * @param {View} ctx.view
    */
 
-  async show({ params }) {
+  async show({ params, auth, response }) {
     const { id } = params;
 
+    const authUser = await auth.getUser();
+
+    if (authUser.id !== parseInt(id, 10)) {
+      return response.send({
+        status: 403,
+        message: "You can't see someone's info",
+      });
+    }
 
     const user = await User.find(id);
 
@@ -63,26 +71,45 @@ class UserController {
    * @param {Response} ctx.response
    */
 
-  async update({ params, request, response }) {
+  async update({ params, request, response, auth }) {
     const { id } = params;
-    const { email, password } = request.post();
 
-    const user = await User.find(id);
+    const {
+      email,
+      password,
+      firstname,
+      lastname,
+      phone,
+      birthday,
+    } = request.only([
+      'email',
+      'password',
+      'firstname',
+      'lastname',
+      'phone',
+      'birthday',
+    ]);
+    const authUser = await auth.getUser();
 
-    if (user) {
-      user.email = email;
-      user.password = password;
+    if (authUser.id !== parseInt(id, 10)) {
+      response.status(403);
 
-      await user.save();
-
-      const updatedUser = await User.find(id);
-
-      return updatedUser;
+      response.send({
+        status: 403,
+        message: "You can't update someone's info",
+      });
     }
 
-    response.status(404);
+    authUser.email = email;
+    authUser.password = password;
+    authUser.firstname = firstname;
+    authUser.lastname = lastname;
+    authUser.phone = phone;
+    authUser.birthday = birthday;
 
-    response.send({ message: 'User not found' });
+    await authUser.save();
+
+    return authUser;
   }
 
   /**

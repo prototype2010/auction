@@ -1,5 +1,6 @@
 'use strict';
 
+const Mail = use('Mail');
 /*
 |--------------------------------------------------------------------------
 | Vow file
@@ -26,6 +27,8 @@ module.exports = (cli, runner) => {
     */
     use('Adonis/Src/Server').listen(process.env.HOST, process.env.PORT);
 
+    Mail.fake();
+
     /*
     |--------------------------------------------------------------------------
     | Run migrations
@@ -37,7 +40,6 @@ module.exports = (cli, runner) => {
     // await ace.call('migration:run', {}, { silent: true })
   });
 
-
   runner.after(async () => {
     /*
     |--------------------------------------------------------------------------
@@ -47,10 +49,12 @@ module.exports = (cli, runner) => {
     | Shutdown the HTTP server when all tests have been executed.
     |
     */
+
+    Mail.restore();
+
     use('Adonis/Src/Server')
       .getInstance()
       .close();
-
 
     /*
     |--------------------------------------------------------------------------
@@ -64,4 +68,3 @@ module.exports = (cli, runner) => {
     // await ace.call('migration:reset', {}, { silent: true })
   });
 };
-

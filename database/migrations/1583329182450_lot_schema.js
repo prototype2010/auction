@@ -5,13 +5,13 @@ const Schema = use('Schema');
 
 class LotSchema extends Schema {
   up() {
-    this.table('lots', table => {
+    this.table('lots', (table) => {
       table.dropColumn('name');
     });
   }
 
   down() {
-    this.table('lots', table => {
+    this.table('lots', (table) => {
       table.string('name');
     });
   }

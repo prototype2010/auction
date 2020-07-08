@@ -13,8 +13,8 @@
 
 /** @type {import('@adonisjs/lucid/src/Factory')} */
 const Factory = use('Factory');
-const Hash = use('Hash');
 const Faker = require('faker');
+const moment = require('moment');
 
 Factory.blueprint('App/Models/Lot', () => {
   const price = Math.ceil(Math.random() * 1000);
@@ -32,12 +32,14 @@ Factory.blueprint('App/Models/Lot', () => {
 });
 
 Factory.blueprint('App/Models/User', async () => ({
-  password: await Hash.make(Faker.internet.password()),
+  password: Faker.internet.password(),
   email: Faker.internet.email(),
   firstname: Faker.name.firstName(),
   lastname: Faker.name.lastName(),
-  birthday: Faker.date.past(),
+  birthday: moment()
+    .subtract(30, 'years')
+    .toISOString(),
   phone: Faker.phone.phoneNumber(),
 }));
 
-Factory.blueprint('App/Models/Bid', async () => ({ }));
+Factory.blueprint('App/Models/Bid', async () => ({}));
