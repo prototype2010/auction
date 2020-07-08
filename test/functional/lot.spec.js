@@ -3,8 +3,6 @@ const { test, trait } = use('Test/Suite')('Lot');
 const Factory = use('Factory');
 const Lot = use('App/Models/Lot');
 const Event = use('Event');
-const LotManager = use('LotManager');
-const fs = require('fs');
 
 const { timeout } = use('Test/Runner');
 timeout(Number.MAX_SAFE_INTEGER);
@@ -491,61 +489,6 @@ test('After delete lot correct event is fired', async ({ assert, client }) => {
   assert.deepEqual(JSON.stringify(data[0]), JSON.stringify(lotResponse.body)); // without .stringify does not work. Fucking adonis !!!
 
   Event.restore();
-});
-
-
-test('Lot manager saves lots correctly', async ({ assert, client }) => {
-  const user = await createUser();
-  const lot = await makeLot();
-
-  const { body: lotInfo } = await client.post('/lots')
-    .send(lot.toJSON())
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
-  const savedLot = await LotManager.getLot(lotInfo.id);
-
-  assert.deepEqual(savedLot, lotInfo);
-});
-
-
-test('Lot manager updates lots correctly', async ({ assert, client }) => {
-  const user = await createUser();
-  const lot = await makeLot();
-
-  const newLotResponse = await client.post('/lots')
-    .send(lot.toJSON())
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
-  const newTitle = 'I AM NEW TITLE';
-
-  const { body: updatedLotInfo } = await client.put(`/lots/${newLotResponse.body.id}`)
-    .send({ ...lot.toJSON(), title: newTitle })
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
-  const savedLot = await LotManager.getLot(updatedLotInfo.id);
-
-  assert.deepEqual(savedLot, updatedLotInfo);
-});
-
-test('Lot manager deletes lots correctly', async ({ assert, client }) => {
-  const user = await createUser();
-  const lot = await makeLot();
-
-  const { body } = await client.post('/lots')
-    .send(lot.toJSON())
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
-  await client.delete(`/lots/${body.id}`)
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
-  const filePath = `${LotManager.fileManager.folderPath}/${body.id}`;
-
-  assert.isNotOk(fs.existsSync(filePath), 'File should not exist');
 });
 
 test('Lot becomes active', async ({ assert, client }) => {

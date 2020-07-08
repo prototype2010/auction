@@ -2,7 +2,6 @@
 const Bull = require('bull');
 const moment = require('moment');
 const Lot = use('App/Models/Lot');
-const LotManager = use('LotManager');
 const TimeUtils = use('TimeUtils');
 
 const Event = use('Event');
@@ -43,7 +42,7 @@ NewLotsQueue.on('completed', async job => {
   const lot = await Lot.find(job.data.id);
 
   if(lot && lot.status === 'inProcess') {
-    LotManager.deleteLot(lot.id)
+
   }
 });
 
