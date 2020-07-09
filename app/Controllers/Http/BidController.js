@@ -33,7 +33,7 @@ class BidController {
     const bid = new Bid();
 
     bid.user_id = id;
-    bid.proposedPrice = proposedPrice;
+    bid.proposed_price = proposedPrice;
     bid.lot_id = lotId;
 
     bid.save();
@@ -58,7 +58,7 @@ class BidController {
 
     const bid = Bid.findBy({ id: bidId, user_id: userId });
 
-    bid.proposedPrice = proposedPrice;
+    bid.proposed_price = proposedPrice;
 
     bid.save();
 

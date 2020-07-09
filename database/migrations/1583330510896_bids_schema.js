@@ -7,7 +7,7 @@ class BidsSchema extends Schema {
   up() {
     this.create('bids', (table) => {
       table.increments();
-      table.float('proposedPrice').notNullable();
+      table.float('proposed_price').notNullable();
       table
         .integer('user_id')
         .notNullable()
