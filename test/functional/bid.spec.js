@@ -43,7 +43,7 @@ test('One bid is being created', async ({ client, assert }) => {
   await client.post('/bids')
     .send({
       lotId: lot.id,
-      proposedPrice: lot.estimatedPrice + 1,
+      proposedPrice: lot.currentPrice + 1,
     })
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
@@ -65,7 +65,7 @@ test('POST 200 One bid is being created', async ({ client }) => {
   const resp = await client.post('/bids')
     .send({
       lotId: lot.id,
-      proposedPrice: lot.estimatedPrice + 1,
+      proposedPrice: lot.currentPrice + 1,
     })
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
@@ -85,7 +85,7 @@ test('POST 422 Cannot bid on inactive lot', async ({ client }) => {
   const resp = await client.post('/bids')
     .send({
       lotId: lot.id,
-      proposedPrice: lot.estimatedPrice + 1,
+      proposedPrice: lot.currentPrice + 1,
     })
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
@@ -197,7 +197,7 @@ test('POST 200 Bid can be done with over estimated price', async ({ client }) =>
   resp.assertStatus(200);
 });
 
-test('POST 422 Bid cannot be done with over lower than estimated price', async ({ client }) => {
+test('POST 422 Bid cannot be done with over lower than current price', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -209,7 +209,7 @@ test('POST 422 Bid cannot be done with over lower than estimated price', async (
   const resp = await client.post('/bids')
     .send({
       lotId: lot.id,
-      proposedPrice: lot.estimatedPrice - 1,
+      proposedPrice: lot.currentPrice - 1,
     })
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
@@ -229,7 +229,7 @@ test('POST 200 Bid JSON structure looks as expected', async ({ client, assert })
   const resp = await client.post('/bids')
     .send({
       lotId: lot.id,
-      proposedPrice: lot.estimatedPrice + 1,
+      proposedPrice: lot.currentPrice + 1,
     })
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
@@ -258,14 +258,14 @@ test('PUT 200 Bid can be updated', async ({ client }) => {
   const bid = await Factory.model('App/Models/Bid').make();
 
   bid.lot_id = lot.id;
-  bid.proposed_price = lot.estimatedPrice + 1;
+  bid.proposed_price = lot.currentPrice + 1;
 
   await bidderUser.bids().save(bid);
 
   const resp = await client.put(`/bids/${bid.id}`)
     .send({
       lotId: lot.id,
-      proposedPrice: lot.estimatedPrice + 1,
+      proposedPrice: lot.currentPrice + 1,
     })
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
@@ -273,7 +273,7 @@ test('PUT 200 Bid can be updated', async ({ client }) => {
   resp.assertStatus(200);
 });
 
-test('PUT 422 Bid cannot be updated with lower than estimate price', async ({ client }) => {
+test('PUT 422 Bid cannot be updated with lower than current price', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -285,7 +285,7 @@ test('PUT 422 Bid cannot be updated with lower than estimate price', async ({ cl
   const bid = await Factory.model('App/Models/Bid').make();
 
   bid.lot_id = lot.id;
-  bid.proposed_price = lot.estimatedPrice + 1;
+  bid.proposed_price = lot.currentPrice + 1;
 
   await bidderUser.bids().save(bid);
 
@@ -311,7 +311,7 @@ test('PUT 200 Updated bid price is updated', async ({ client, assert }) => {
 
   const bid = await Factory.model('App/Models/Bid').make();
 
-  const newPrice = lot.estimatedPrice + 1;
+  const newPrice = lot.currentPrice + 1;
 
   bid.lot_id = lot.id;
   bid.proposed_price = newPrice;
