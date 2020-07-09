@@ -7,6 +7,8 @@ trait('Test/ApiClient');
 trait('Auth/Client');
 
 const Bid = use('App/Models/Bid');
+const Lot = use('App/Models/Lot');
+const Event = use('Event');
 
 const { getDBRowsNumber } = require('../utils');
 
@@ -325,6 +327,57 @@ test('PUT 200 Updated bid price is updated', async ({ client, assert }) => {
 
   assert.equal(newPrice, resp.body.proposed_price);
 });
+
+
+test('Raise bid should throw raise event', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  Event.fake();
+
+  const bid = await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: lot.estimatedPrice + 1,
+    })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  const { event, data } = Event.recent();
+
+  assert.equal(event, 'bid::new');
+  assert.deepEqual(data[0].toJSON(), bid.body);
+
+  Event.restore();
+});
+test('After raise lot current price should be higher', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const newPrice = lot.currentPrice + 1;
+  const bid = await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: newPrice,
+    })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  const updatedLot = await Lot.findBy({ id: lot.id });
+
+  assert.equal(updatedLot.currentPrice, newPrice);
+  assert.equal(bid.body.proposed_price, newPrice);
+}).timeout(0);
 
 test('PUT 422 closed lot cannot be bidded', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
