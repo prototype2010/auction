@@ -49,7 +49,7 @@ test('One bid is being created', async ({ client, assert }) => {
   const bidsAmountAfter = await getDBRowsNumber(Bid);
 
   assert.equal(bidsAmountBefore + 1, bidsAmountAfter);
-}).timeout(0);
+});
 
 test('POST 200 One bid is being created', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -69,7 +69,7 @@ test('POST 200 One bid is being created', async ({ client }) => {
     .end();
 
   resp.assertStatus(200);
-}).timeout(0);
+});
 
 test('POST 422 Cannot bid on inactive lot', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -89,7 +89,7 @@ test('POST 422 Cannot bid on inactive lot', async ({ client }) => {
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 test('POST 422 Bid cannot be zero', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -109,7 +109,7 @@ test('POST 422 Bid cannot be zero', async ({ client }) => {
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 
 test('POST 422 Bid cannot be negative', async ({ client }) => {
@@ -130,7 +130,7 @@ test('POST 422 Bid cannot be negative', async ({ client }) => {
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 
 test('POST 422 Bid cannot be done for closed lot', async ({ client }) => {
@@ -151,7 +151,7 @@ test('POST 422 Bid cannot be done for closed lot', async ({ client }) => {
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 
 test('POST 200 Bid can be done with estimated price', async ({ client }) => {
@@ -172,7 +172,7 @@ test('POST 200 Bid can be done with estimated price', async ({ client }) => {
     .end();
 
   resp.assertStatus(200);
-}).timeout(0);
+});
 
 
 test('POST 200 Bid can be done with over estimated price', async ({ client }) => {
@@ -193,7 +193,7 @@ test('POST 200 Bid can be done with over estimated price', async ({ client }) =>
     .end();
 
   resp.assertStatus(200);
-}).timeout(0);
+});
 
 test('POST 422 Bid cannot be done with over lower than estimated price', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -213,7 +213,7 @@ test('POST 422 Bid cannot be done with over lower than estimated price', async (
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 test('POST 200 Bid JSON structure looks as expected', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -241,7 +241,7 @@ test('POST 200 Bid JSON structure looks as expected', async ({ client, assert })
   assert.isOk(resp.body.id);
 
   resp.assertStatus(200);
-}).timeout(0);
+});
 
 
 test('PUT 200 Bid can be updated', async ({ client }) => {
@@ -269,7 +269,7 @@ test('PUT 200 Bid can be updated', async ({ client }) => {
     .end();
 
   resp.assertStatus(200);
-}).timeout(0);
+});
 
 test('PUT 422 Bid cannot be updated with lower than estimate price', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -296,7 +296,7 @@ test('PUT 422 Bid cannot be updated with lower than estimate price', async ({ cl
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 test('PUT 200 Updated bid price is updated', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -324,7 +324,7 @@ test('PUT 200 Updated bid price is updated', async ({ client, assert }) => {
   resp.assertStatus(200);
 
   assert.equal(newPrice, resp.body.proposed_price);
-}).timeout(0);
+});
 
 test('PUT 422 closed lot cannot be bidded', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -350,7 +350,7 @@ test('PUT 422 closed lot cannot be bidded', async ({ client }) => {
     .end();
 
   resp.assertStatus(422);
-}).timeout(0);
+});
 
 test('DELETE 200 inProcess lot can bidded', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -373,7 +373,7 @@ test('DELETE 200 inProcess lot can bidded', async ({ client }) => {
     .end();
 
   resp.assertStatus(200);
-}).timeout(0);
+});
 
 test('DELETE 403 bid for closed lot cannot deleted', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
@@ -396,4 +396,4 @@ test('DELETE 403 bid for closed lot cannot deleted', async ({ client }) => {
     .end();
 
   resp.assertStatus(403);
-}).timeout(0);
+});
