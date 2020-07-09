@@ -24,6 +24,7 @@ const providers = [
   '@adonisjs/validator/providers/ValidatorProvider',
   '@adonisjs/mail/providers/MailProvider',
   '@adonisjs/redis/providers/RedisProvider',
+  path.join(__dirname, '..', 'providers', 'BidsManagerProvider'),
   path.join(__dirname, '..', 'providers', 'LotsManagerProvider'),
   path.join(__dirname, '..', 'providers', 'TimeUtilsProvider'),
 ];

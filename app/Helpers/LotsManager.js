@@ -39,9 +39,6 @@ LotsQueue.on('completed', async job => {
   }
 });
 
-
-
-
 module.exports = {
   LotsQueue
 };
