@@ -10,7 +10,7 @@ const Bid = use('App/Models/Bid');
 const Lot = use('App/Models/Lot');
 const Event = use('Event');
 
-const { getDBRowsNumber } = require('../utils');
+const { getDBRowsNumber, waitFor } = require('../utils');
 
 trait('Test/ApiClient');
 
@@ -355,6 +355,7 @@ test('Raise bid should throw raise event', async ({ client, assert }) => {
 
   Event.restore();
 });
+
 test('After raise lot current price should be higher', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
@@ -373,11 +374,13 @@ test('After raise lot current price should be higher', async ({ client, assert }
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
 
+  await waitFor(200);
+
   const updatedLot = await Lot.findBy({ id: lot.id });
 
-  assert.equal(updatedLot.currentPrice, newPrice);
   assert.equal(bid.body.proposed_price, newPrice);
-}).timeout(0);
+  assert.equal(updatedLot.currentPrice, newPrice);
+});
 
 test('PUT 422 closed lot cannot be bidded', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();

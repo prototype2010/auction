@@ -1,6 +1,6 @@
 /* eslint-disable */
 const Bull = require('bull');
-const Bid = use('App/Models/Bid');
+const Lot = use('App/Models/Lot');
 
 const BidsQueue = new Bull('bids', {
   limiter: {
@@ -11,14 +11,14 @@ const BidsQueue = new Bull('bids', {
 
 BidsQueue.process(async job => {
 
-  const { id, proposer_price } = job.data
+  const { proposed_price, lot_id } = job.data
 
-  const bid = await Bid.findBy({id});
+  const lot = await Lot.findBy({id: Number(lot_id)});
 
-  if(bid && proposer_price > bid.proposed_price) {
-    bid.proposer_price = proposer_price;
+  if(lot && Number(proposed_price) > lot.currentPrice) {
+    lot.currentPrice = proposed_price;
 
-    await bid.save();
+    await lot.save();
   }
 
   job.progress(100);
