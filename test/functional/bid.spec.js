@@ -242,7 +242,7 @@ test('POST 200 Bid JSON structure looks as expected', async ({ client, assert })
 }).timeout(0);
 
 
-test('POST 200 Bid can be updated', async ({ client }) => {
+test('PUT 200 Bid can be updated', async ({ client }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -260,6 +260,85 @@ test('POST 200 Bid can be updated', async ({ client }) => {
 
   const resp = await client.put(`/bids/${bid.id}`)
     .send({ ...bid.toJSON(), lotId: lot.id, proposedPrice: lot.estimatedPrice + 1 })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  resp.assertStatus(200);
+}).timeout(0);
+
+test('PUT 200 Updated bid price is updated', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  const newPrice = lot.estimatedPrice + 1;
+
+  bid.lot_id = lot.id;
+  bid.proposed_price = newPrice;
+
+  await bidderUser.bids().save(bid);
+
+  const resp = await client.put(`/bids/${bid.id}`)
+    .send({ ...bid.toJSON(), lotId: lot.id, proposedPrice: newPrice })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  resp.assertStatus(200);
+
+  assert.equal(newPrice, resp.body.proposed_price);
+}).timeout(0);
+
+test('PUT 422 closed lot cannot be bidded', async ({ client }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'closed';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  const newPrice = lot.estimatedPrice + 1;
+
+  bid.lot_id = lot.id;
+  bid.proposed_price = newPrice;
+
+  await bidderUser.bids().save(bid);
+
+  const resp = await client.put(`/bids/${bid.id}`)
+    .send({ ...bid.toJSON(), lotId: lot.id, proposedPrice: newPrice })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  resp.assertStatus(422);
+}).timeout(0);
+
+test('DELETE 200 inProcess lot can bidded', async ({ client }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  const newPrice = lot.estimatedPrice + 1;
+
+  bid.lot_id = lot.id;
+  bid.proposed_price = newPrice;
+
+  await bidderUser.bids().save(bid);
+
+  const resp = await client.delete(`/bids/${bid.id}`)
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
 

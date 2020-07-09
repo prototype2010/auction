@@ -56,7 +56,7 @@ class BidController {
     const { id: userId } = await auth.getUser();
     const { id: bidId } = params;
 
-    const bid = Bid.findBy({ id: bidId, user_id: userId });
+    const bid = await Bid.findBy({ id: bidId, user_id: userId });
 
     bid.proposed_price = proposedPrice;
 
