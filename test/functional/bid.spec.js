@@ -3,6 +3,11 @@
 const { test, trait } = use('Test/Suite')('Bid');
 const Factory = use('Factory');
 
+trait('Test/ApiClient');
+trait('Auth/Client');
+
+const Bid = use('App/Models/Bid');
+
 const { getUserToken, getDBRowsNumber, createUser, makeLot, waitFor } = require('../utils');
 
 trait('Test/ApiClient');
@@ -12,31 +17,36 @@ test('Bid can be created', async () => {
   const bidder = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
 
-  const { currentPrice } = lot.toJSON();
-
   await creator.lots().save(lot);
 
   const bid = await Factory.model('App/Models/Bid').make();
 
-  bid.proposedPrice = currentPrice + 1;
+  bid.proposedPrice = lot.currentPrice + 1;
   bid.lot_id = lot.id;
 
   await bidder.bids().save(bid);
 });
 
-test('One bid is being created', async () => {
+test('One bid is being created', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
-
-  const { currentPrice } = lot.toJSON();
 
   await creatorUser.lots().save(lot);
 
   const bid = await Factory.model('App/Models/Bid').make();
 
-  bid.proposedPrice = currentPrice + 1;
-  bid.lot_id = lot.id;
+  bid.lotId = lot.id;
+  bid.proposedPrice = lot.currentPrice + 1;
 
-  await bidderUser.bids().save(bid);
-});
+  const bidsAmountBefore = await getDBRowsNumber(Bid);
+
+  const resp = await client.post('/bids')
+    .send(bid.toJSON())
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  const bidsAmountAfter = await getDBRowsNumber(Bid);
+
+  assert.equal(bidsAmountBefore + 1, bidsAmountAfter);
+}).timeout(0);

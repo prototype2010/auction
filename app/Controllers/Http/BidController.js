@@ -21,10 +21,10 @@ class BidController {
 
   async store({ request, auth }) {
     const {
-      lodId,
+      lotId,
       proposedPrice,
     } = request.only([
-      'lodId',
+      'lotId',
       'proposedPrice',
     ]);
 
@@ -34,7 +34,7 @@ class BidController {
 
     bid.user_id = id;
     bid.proposedPrice = proposedPrice;
-    bid.lot_id = lodId;
+    bid.lot_id = lotId;
 
     bid.save();
 
@@ -49,7 +49,7 @@ class BidController {
 
   async update({ params, request, auth }) {
     const { proposedPrice } = request.only([
-      'lodId',
+      'lotId',
       'proposedPrice',
     ]);
 

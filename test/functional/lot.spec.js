@@ -4,9 +4,6 @@ const Factory = use('Factory');
 const Lot = use('App/Models/Lot');
 const Event = use('Event');
 
-const { timeout } = use('Test/Runner');
-timeout(Number.MAX_SAFE_INTEGER);
-
 trait('Test/ApiClient');
 trait('Auth/Client');
 

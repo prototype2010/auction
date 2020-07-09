@@ -12,17 +12,17 @@ const validBidPrice = async (data, field, message, args, get) => {
 
 
 const lotExists = async (data, field, message, args, get) => {
-  const lodId = +get(data, 'lodId');
+  const lotId = +get(data, 'lotId');
 
-  await Lot.findByOrFail({ id: lodId });
+  await Lot.findByOrFail({ id: lotId });
 
   return true;
 };
 
 const lotInProcess = async (data, field, message, args, get) => {
-  const lodId = +get(data, 'lodId');
+  const lotId = +get(data, 'lotId');
 
-  await Lot.findByOrFail({ id: lodId, status: 'inProcess' });
+  await Lot.findByOrFail({ id: lotId, status: 'inProcess' });
 
   return true;
 };
