@@ -33,7 +33,7 @@ class BidController {
 
     await bid.save();
 
-    Event.fire('bid:new', bid);
+    Event.fire('bid::new', bid);
 
     return bid;
   }

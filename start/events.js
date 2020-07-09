@@ -7,7 +7,7 @@ const { LotsQueue } = use('LotsManager');
 const { BidsQueue } = use('BidsManager');
 const { getDiffMillisecondsFromNow } = use('TimeUtils');
 
-Event.on('bid:new', async bid => {
+Event.on('bid::new', async bid => {
   BidsQueue.add(bid, { delay: 0 });
 });
 
