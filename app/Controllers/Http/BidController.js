@@ -36,7 +36,7 @@ class BidController {
     bid.proposed_price = proposedPrice;
     bid.lot_id = lotId;
 
-    bid.save();
+    await bid.save();
 
     return bid;
   }
@@ -60,7 +60,7 @@ class BidController {
 
     bid.proposed_price = proposedPrice;
 
-    bid.save();
+    await bid.save();
 
     return bid;
   }
@@ -76,7 +76,9 @@ class BidController {
     if (lot.status !== 'inProcess') {
       response.status(403).send({ message: 'Only bid for lot with "inProcess" status can be deleted' });
     } else {
-      return bid.delete();
+      await bid.delete();
+
+      return bid;
     }
   }
 }
