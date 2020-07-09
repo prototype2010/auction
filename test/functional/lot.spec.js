@@ -13,13 +13,13 @@ trait('Auth/Client');
 const path = require('path');
 const moment = require('moment');
 
-const { getUserToken, getDBRowsNumber, createUser, makeLot, waitFor } = require('../utils');
+const { getUserToken, getDBRowsNumber, createUser, createLot, waitFor } = require('../utils');
 
 test('Lot can be created', async ({ assert, client }) => {
   const lotsAmountBefore = await getDBRowsNumber(Lot);
 
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   await client.post('/lots')
     .send(lot.toJSON())
@@ -33,7 +33,7 @@ test('Lot can be created', async ({ assert, client }) => {
 
 test('POST 200 Lot can be created', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -45,7 +45,7 @@ test('POST 200 Lot can be created', async ({ assert, client }) => {
 
 test('POST 200 Lot contains all required keys', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -109,7 +109,7 @@ test('POST 200 Image can be attached', async ({ assert, client }) => {
 
 test('POST 422 Lot can\'t be created with wrong date (start in the past)', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({ lotStartTime: moment().subtract(1, 'hour').toISOString() });
+  const lot = await createLot({ lotStartTime: moment().subtract(1, 'hour').toISOString() });
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -124,7 +124,7 @@ test('POST 422 Lot can\'t be created with wrong date (start in the past)', async
 
 test('POST 422 Lot can\'t be created with wrong date (end before it starts)', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     lotStartTime: moment().add(1, 'hour').toISOString(),
     lotEndTime: moment().subtract(2, 'hour').toISOString(),
   });
@@ -141,7 +141,7 @@ test('POST 422 Lot can\'t be created with wrong date (end before it starts)', as
 
 test('POST 422 Lot can\'t be created with wrong estimated price', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     currentPrice: 10,
     estimatedPrice: 9,
   });
@@ -159,7 +159,7 @@ test('POST 422 Lot can\'t be created with wrong estimated price', async ({ asser
 
 test('POST 422 Lot can\'t be created with current price = 0', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({ currentPrice: 0 });
+  const lot = await createLot({ currentPrice: 0 });
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -174,7 +174,7 @@ test('POST 422 Lot can\'t be created with current price = 0', async ({ assert, c
 
 test('POST 422 Lot can\'t be created with estimated price = 0', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({ estimatedPrice: 0 });
+  const lot = await createLot({ estimatedPrice: 0 });
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -188,7 +188,7 @@ test('POST 422 Lot can\'t be created with estimated price = 0', async ({ assert,
 
 test('POST 422 Lot can\'t be created with both current and estimated price = 0', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     estimatedPrice: 0,
     currentPrice: 0,
   });
@@ -205,7 +205,7 @@ test('POST 422 Lot can\'t be created with both current and estimated price = 0',
 
 test('POST 422 Lot can\'t be created with both current and estimated price string', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     estimatedPrice: '100$',
     currentPrice: 999,
   });
@@ -222,7 +222,7 @@ test('POST 422 Lot can\'t be created with both current and estimated price strin
 
 test('POST 200 Lot is created with pending status', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -239,7 +239,7 @@ test('POST 200 Lot is created with pending status', async ({ assert, client }) =
 
 test('GET 200 Lot can be gotten by id', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -257,7 +257,7 @@ test('GET 200 Lot can be gotten by id', async ({ assert, client }) => {
 
 test('DELETE 200 Lot can be deleted', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -274,7 +274,7 @@ test('DELETE 200 Lot can be deleted', async ({ assert, client }) => {
 
 test('Deleted lot is deleted from database', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -295,7 +295,7 @@ test('Deleted lot is deleted from database', async ({ assert, client }) => {
 test('DELETE 404 User can delete only own lots', async ({ assert, client }) => {
   const user = await createUser();
   const unathorizedUser = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const lotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -314,7 +314,7 @@ test('DELETE 404 User can delete only own lots', async ({ assert, client }) => {
 
 test('PUT 200 Lot can be updated', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   await client.post('/lots')
     .send(lot.toJSON())
@@ -332,7 +332,7 @@ test('PUT 200 Lot can be updated', async ({ assert, client }) => {
 
 test('PUT 200 Lot can be updated', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const newLotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -352,7 +352,7 @@ test('PUT 200 Lot can be updated', async ({ assert, client }) => {
 test('PUT 404 Lot can be updated only by its owner', async ({ assert, client }) => {
   const user = await createUser();
   const unathorizedUser = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const newLotResponse = await client.post('/lots')
     .send(lot.toJSON())
@@ -371,7 +371,7 @@ test('PUT 404 Lot can be updated only by its owner', async ({ assert, client }) 
 
 test('PUT 403 Only pending lots can be updated', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const { body: newLot } = await client.post('/lots')
     .send(lot.toJSON())
@@ -395,7 +395,7 @@ test('PUT 403 Only pending lots can be updated', async ({ assert, client }) => {
 
 test('PUT 403 Only pending lots can be deleted', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   const { body: newLot } = await client.post('/lots')
     .send(lot.toJSON())
@@ -418,7 +418,7 @@ test('PUT 403 Only pending lots can be deleted', async ({ assert, client }) => {
 
 test('After creating lot correct event is fired', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   Event.fake();
 
@@ -437,7 +437,7 @@ test('After creating lot correct event is fired', async ({ assert, client }) => 
 
 test('After updating lot correct event is fired', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   Event.fake();
 
@@ -462,7 +462,7 @@ test('After updating lot correct event is fired', async ({ assert, client }) => 
 
 test('After delete lot correct event is fired', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot();
+  const lot = await createLot();
 
   Event.fake();
 
@@ -486,7 +486,7 @@ test('After delete lot correct event is fired', async ({ assert, client }) => {
 
 test('Lot becomes active', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     lotStartTime: moment().toISOString(),
     lotEndTime: moment().add(1, 'hours').toISOString(),
   });
@@ -510,7 +510,7 @@ test('Lot becomes active', async ({ assert, client }) => {
 test('Lot with updated time didn\'t become active', async ({ assert, client }) => {
   const user = await createUser();
 
-  const lot = await makeLot({
+  const lot = await createLot({
     lotStartTime: moment().add(5, 'seconds').toISOString(),
     lotEndTime: moment().add(1, 'hours').toISOString(),
   });
@@ -541,7 +541,7 @@ test('Lot with updated time didn\'t become active', async ({ assert, client }) =
 
 test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     lotStartTime: moment().toISOString(),
     lotEndTime: moment().add(1, 'hours').toISOString(),
   });
@@ -564,7 +564,7 @@ test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
 
 test('PUT 403 Lot inProcess lot cannot be updated', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     lotStartTime: moment().toISOString(),
     lotEndTime: moment().add(1, 'hours').toISOString(),
   });
@@ -592,7 +592,7 @@ test('PUT 403 Lot inProcess lot cannot be updated', async ({ assert, client }) =
 
 test('GET 200 My lost works fine', async ({ assert, client }) => {
   const user = await createUser();
-  const lot = await makeLot({
+  const lot = await createLot({
     lotStartTime: moment().toISOString(),
     lotEndTime: moment().add(1, 'hours').toISOString(),
   });

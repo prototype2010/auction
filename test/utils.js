@@ -16,7 +16,7 @@ const createUser = async (overrideParams = {}) => {
   return user;
 }
 
-const makeLot = async (overrideParams = {}) => {
+const createLot = async (overrideParams = {}) => {
 
   const lot = await Factory.model('App/Models/Lot').make();
 
@@ -83,6 +83,6 @@ module.exports = {
   getRecentEmail,
   getRecoveryTokenFromLastEmail,
   createUser,
-  makeLot,
+  createLot,
   waitFor,
 };
