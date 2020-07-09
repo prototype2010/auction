@@ -1,13 +1,8 @@
 
 const Bid = use('App/Models/Bid');
 const Lot = use('App/Models/Lot');
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
+const Event = use('Event');
 
-/**
- * Resourceful controller for interacting with bids
- */
 class BidController {
   async index({ auth, request }) {
     const page = request.get().page || 1;
@@ -37,6 +32,8 @@ class BidController {
     bid.lot_id = lotId;
 
     await bid.save();
+
+    Event.fire('bid:new', bid);
 
     return bid;
   }

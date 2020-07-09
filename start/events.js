@@ -4,8 +4,12 @@ const Mail = use('Mail');
 const APP_EMAIL = Env.get('SUPPORT_MAIL');
 const Redis = use('Redis');
 const { LotsQueue } = use('LotsManager');
+const { BidsQueue } = use('BidsManager');
 const { getDiffMillisecondsFromNow } = use('TimeUtils');
 
+Event.on('bid:new', async bid => {
+  BidsQueue.add(bid, { delay: 0 });
+});
 
 Event.on('user::new', async user => {
   await Mail.send('emails.welcome', user, message => {
@@ -50,11 +54,9 @@ Event.on('lot::new', async lot => {
 });
 
 Event.on('lot::update', async lot => {
-
   await Redis.set(lot.id, JSON.stringify(lot));
 });
 
 Event.on('lot::delete', async lot => {
-
   await Redis.del(lot.id, JSON.stringify(lot));
 });
