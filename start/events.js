@@ -3,7 +3,7 @@ const Event = use('Event');
 const Mail = use('Mail');
 const APP_EMAIL = Env.get('SUPPORT_MAIL');
 const Redis = use('Redis');
-const { NewLotsQueue } = use('TaskManager');
+const { LotsQueue } = use('LotsManager');
 const { getDiffMillisecondsFromNow } = use('TimeUtils');
 
 
@@ -46,7 +46,7 @@ Event.on('lot::new', async lot => {
 
   const lotTaskDelay = getDiffMillisecondsFromNow(serializedLot.lotStartTime);
 
-  NewLotsQueue.add(serializedLot, { delay: lotTaskDelay });
+  LotsQueue.add(serializedLot, { delay: lotTaskDelay });
 });
 
 Event.on('lot::update', async lot => {

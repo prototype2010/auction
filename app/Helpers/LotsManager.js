@@ -4,14 +4,14 @@ const moment = require('moment');
 const Lot = use('App/Models/Lot');
 const TimeUtils = use('TimeUtils');
 
-const NewLotsQueue = new Bull('lots', {
+const LotsQueue = new Bull('lots', {
   limiter: {
     max: 100,
     duration: 1000,
   },
 });
 
-NewLotsQueue.process(async job => {
+LotsQueue.process(async job => {
 
   const { data } = job
 
@@ -22,7 +22,7 @@ NewLotsQueue.process(async job => {
     await lot.save();
   } else if(lot && moment(lot.lotStartTime).isAfter(moment())) {
     const newTaskDelay = TimeUtils.getDiffMillisecondsFromNow(lot.lotStartTime)
-    NewLotsQueue.add(lot, { delay: newTaskDelay });
+    LotsQueue.add(lot, { delay: newTaskDelay });
   }
 
   job.progress(100);
@@ -30,7 +30,7 @@ NewLotsQueue.process(async job => {
   return true;
 });
 
-NewLotsQueue.on('completed', async job => {
+LotsQueue.on('completed', async job => {
 
   const lot = await Lot.find(job.data.id);
 
@@ -43,5 +43,5 @@ NewLotsQueue.on('completed', async job => {
 
 
 module.exports = {
-  NewLotsQueue
+  LotsQueue
 };
