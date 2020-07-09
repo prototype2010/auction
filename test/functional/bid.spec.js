@@ -240,3 +240,28 @@ test('POST 200 Bid JSON structure looks as expected', async ({ client, assert })
 
   resp.assertStatus(200);
 }).timeout(0);
+
+
+test('POST 200 Bid can be updated', async ({ client }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.lot_id = lot.id;
+  bid.proposed_price = lot.estimatedPrice + 1;
+
+  await bidderUser.bids().save(bid);
+
+  const resp = await client.put(`/bids/${bid.id}`)
+    .send({ ...bid.toJSON(), lotId: lot.id, proposedPrice: lot.estimatedPrice + 1 })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  resp.assertStatus(200);
+}).timeout(0);

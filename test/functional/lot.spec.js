@@ -65,6 +65,8 @@ test('POST 200 Lot contains all required keys', async ({ assert, client }) => {
 });
 
 
+
+
 test('POST 200 Lot can be created by http', async ({ assert, client }) => {
   const user = await createUser();
   const { title, description, currentPrice, estimatedPrice, lotStartTime, lotEndTime } = await Factory.get('App/Models/Lot').make();
