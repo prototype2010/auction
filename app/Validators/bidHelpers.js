@@ -6,7 +6,7 @@ const moreThanLotCurrentPrice = async (data, field, message, args, get) => {
 
   const lot = await Lot.findByOrFail({ id: lotId });
 
-  if (lot.estimatedPrice > proposedPrice) {
+  if (lot.currentPrice > proposedPrice) {
     throw new Error('Proposed price must be greater than lot current price');
   }
 
