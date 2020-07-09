@@ -1,8 +1,6 @@
 /* eslint-disable */
 const Bull = require('bull');
-const moment = require('moment');
 const Bid = use('App/Models/Bid');
-const TimeUtils = use('TimeUtils');
 
 const BidsQueue = new Bull('bids', {
   limiter: {
@@ -13,7 +11,7 @@ const BidsQueue = new Bull('bids', {
 
 BidsQueue.process(async job => {
 
-  const { lot_id, id, proposer_price } = job.data
+  const { id, proposer_price } = job.data
 
   const bid = await Bid.findBy({id});
 
@@ -21,7 +19,6 @@ BidsQueue.process(async job => {
     bid.proposer_price = proposer_price;
 
     await bid.save();
-    console.log('price increaced to ', proposer_price);
   }
 
   job.progress(100);
@@ -30,10 +27,8 @@ BidsQueue.process(async job => {
 });
 
 BidsQueue.on('completed', async job => {
-
   const { data } = job
 
-// TODO NOTIFY BID RAISE HERE
 });
 
 module.exports = {
