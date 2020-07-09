@@ -6,7 +6,7 @@ class BidStore extends BaseValidator {
   get rules() {
     return {
       lotId: 'required|number|lotExists|lotInProcess',
-      proposedPrice: 'required|number|validBidPrice',
+      proposedPrice: 'required|number|validBidPrice|moreThanLotCurrentPrice',
     };
   }
 }
