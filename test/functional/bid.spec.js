@@ -331,10 +331,8 @@ test('DELETE 200 inProcess lot can bidded', async ({ client }) => {
 
   const bid = await Factory.model('App/Models/Bid').make();
 
-  const newPrice = lot.estimatedPrice + 1;
-
   bid.lot_id = lot.id;
-  bid.proposed_price = newPrice;
+  bid.proposed_price = lot.estimatedPrice + 1;
 
   await bidderUser.bids().save(bid);
 
@@ -343,4 +341,27 @@ test('DELETE 200 inProcess lot can bidded', async ({ client }) => {
     .end();
 
   resp.assertStatus(200);
+}).timeout(0);
+
+test('DELETE 403 bid for closed lot cannot deleted', async ({ client }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'closed';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.lot_id = lot.id;
+  bid.proposed_price = lot.estimatedPrice + 1;
+
+  await bidderUser.bids().save(bid);
+
+  const resp = await client.delete(`/bids/${bid.id}`)
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  resp.assertStatus(403);
 }).timeout(0);

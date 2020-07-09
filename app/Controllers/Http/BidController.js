@@ -69,9 +69,9 @@ class BidController {
     const { id: userId } = await auth.getUser();
     const { id: bidId } = params;
 
-    const bid = await Bid.findOrFail({ user_id: userId, id: bidId });
+    const bid = await Bid.findByOrFail({ user_id: userId, id: +bidId });
 
-    const lot = await Lot.findOrFail({ id: bid.lot_id });
+    const lot = await Lot.findByOrFail({ id: bid.lot_id });
 
     if (lot.status !== 'inProcess') {
       response.status(403).send({ message: 'Only bid for lot with "inProcess" status can be deleted' });
