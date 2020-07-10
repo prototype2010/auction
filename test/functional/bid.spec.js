@@ -380,7 +380,7 @@ test('Bid lot with estimated price should close the lot', async ({ client, asser
   assert.equal(closedLot.status, 'closed');
 });
 
-test('Bid lot with over estimated price should close the lot', async ({ client, assert }) => {
+test('Close lot event should be thrown after bid estimated price', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -389,6 +389,8 @@ test('Bid lot with over estimated price should close the lot', async ({ client, 
 
   await creatorUser.lots().save(lot);
 
+  // Event.fake();
+//  TODO
   await client.post('/bids')
     .send({
       lotId: lot.id,
@@ -397,12 +399,17 @@ test('Bid lot with over estimated price should close the lot', async ({ client, 
     .loginVia(bidderUser.toJSON(), 'jwt')
     .end();
 
-  await waitFor(200);
+  await waitFor(400);
 
   const closedLot = await Lot.find(lot.id);
 
+  const events = Event.all();
+
   assert.equal(closedLot.status, 'closed');
-});
+
+
+  // Event.restore();
+}).timeout(0);
 
 test('Bid lot with lower estimated price should not close the lot', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
