@@ -477,4 +477,4 @@ test('Bided lot should appear in my lots', async ({ client, assert }) => {
   const bidedLot = resp.body.data.find(({ id }) => id === bid.lot_id);
 
   assert.equal(bidedLot.id, lot.id);
-})
+});
