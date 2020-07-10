@@ -21,16 +21,16 @@ class LotController {
       title,
       currentPrice,
       estimatedPrice,
-      lotStartTime,
-      lotEndTime,
+      startTime,
+      endTime,
       description
     } = request.only([
       'title',
       'currentPrice',
       'description',
       'estimatedPrice',
-      'lotStartTime',
-      'lotEndTime',
+      'startTime',
+      'endTime',
     ]);
 
     const image = await this.saveImageIfAttached(request);
@@ -42,8 +42,8 @@ class LotController {
     lot.title = title;
     lot.currentPrice = currentPrice;
     lot.estimatedPrice = estimatedPrice;
-    lot.lotStartTime = lotStartTime;
-    lot.lotEndTime = lotEndTime;
+    lot.startTime = startTime;
+    lot.endTime = endTime;
     lot.image = image;
     lot.status = 'pending';
 
@@ -82,16 +82,16 @@ class LotController {
       title,
       currentPrice,
       estimatedPrice,
-      lotStartTime,
-      lotEndTime,
+      startTime,
+      endTime,
       description
     } = request.only([
       'title',
       'currentPrice',
       'description',
       'estimatedPrice',
-      'lotStartTime',
-      'lotEndTime',
+      'startTime',
+      'endTime',
     ]);
 
     const { id : userId} = await auth.getUser();
@@ -109,8 +109,8 @@ class LotController {
       lot.description = description;
       lot.currentPrice = currentPrice;
       lot.estimatedPrice = estimatedPrice;
-      lot.lotStartTime = lotStartTime;
-      lot.lotEndTime = lotEndTime;
+      lot.startTime = startTime;
+      lot.endTime = endTime;
 
       await lot.save();
 

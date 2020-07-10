@@ -12,8 +12,8 @@ class LotStore extends BaseValidator {
       image: 'required_when:file|file_size:5mb|file_types:image',
       currentPrice: 'required|number',
       estimatedPrice: 'required|number|validLotPrices',
-      lotStartTime: 'required|date',
-      lotEndTime: 'required|date|validLotDates',
+      startTime: 'required|date',
+      endTime: 'required|date|validLotDates',
     };
   }
 }

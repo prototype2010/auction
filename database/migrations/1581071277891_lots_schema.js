@@ -15,8 +15,8 @@ class LotsSchema extends Schema {
         .defaultTo('pending');
       table.float('currentPrice', { precision: 2 });
       table.float('estimatedPrice', { precision: 2 });
-      table.timestamp('lotStartTime');
-      table.timestamp('lotEndTime');
+      table.timestamp('startTime');
+      table.timestamp('endTime');
       // table
       //   .integer('winner_id')
       //   .notNullable()

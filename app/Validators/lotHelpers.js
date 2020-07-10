@@ -1,19 +1,19 @@
 const moment = require('moment');
 
 const validLotDates = async (data, field, message, args, get) => {
-  const lotStartTime = get(data, 'lotStartTime');
-  const lotEndTime = get(data, 'lotEndTime');
+  const startTime = get(data, 'startTime');
+  const lotEndTime = get(data, 'endTime');
 
-  if (moment(lotEndTime).isBefore(moment(lotStartTime))) {
+  if (moment(lotEndTime).isBefore(moment(startTime))) {
     throw new Error('Auction can\'t end before it starts');
   }
 
   if (process.env.NODE_ENV !== 'testing' /* for testing purposes we wont wait for an hour */
-    && moment(lotEndTime).isBefore(moment(lotStartTime).add(1, 'hour'))) {
+    && moment(lotEndTime).isBefore(moment(startTime).add(1, 'hour'))) {
     throw new Error('Auction can\'t last less than an hour ');
   }
 
-  if (moment(lotStartTime).add(1, 'minute').isBefore(moment())) { /* 1 minute as maximum processing time */
+  if (moment(startTime).add(1, 'minute').isBefore(moment())) { /* 1 minute as maximum processing time */
     throw new Error('Auction can\'t be started in the past');
   }
 };

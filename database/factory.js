@@ -22,8 +22,8 @@ Factory.blueprint('App/Models/Lot', () => {
     description: Faker.lorem.sentence(),
     currentPrice: price,
     estimatedPrice: price * 2,
-    lotStartTime: moment().add(10, 'minutes').toISOString(),
-    lotEndTime: moment().add(2, 'hour').toISOString(),
+    startTime: moment().add(10, 'minutes').toISOString(),
+    endTime: moment().add(2, 'hour').toISOString(),
   };
 });
 

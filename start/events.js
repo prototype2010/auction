@@ -58,7 +58,7 @@ Event.on('lot::new', async lot => {
 
   await Redis.set(lot.id, serializedLot);
 
-  const lotTaskDelay = getDiffMillisecondsFromNow(serializedLot.lotStartTime);
+  const lotTaskDelay = getDiffMillisecondsFromNow(serializedLot.startTime);
 
   LotsQueue.add(serializedLot, { delay: lotTaskDelay });
 });
