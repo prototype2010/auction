@@ -67,8 +67,6 @@ Event.on('lot::closedByTime', async lot => {
 
     Event.fire('lot::closed', closedLot);
   }
-
-
 });
 /* eslint-enable */
 
