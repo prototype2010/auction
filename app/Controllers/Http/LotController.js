@@ -1,5 +1,6 @@
 /* eslint-disable */
 const Lot = use('App/Models/Lot');
+const Database = use('Database');
 const Helpers = use('Helpers')
 const uid = require('uid');
 const Event = use('Event');
@@ -180,11 +181,18 @@ class LotController {
   async myLots({auth, response, request}) {
 
     const page = request.get().page || 1
-    const user = await auth.getUser();
+    const {id} = await auth.getUser();
 
-    return await Lot
+    const myBidedLots = await Database
+      .select('*')
+      .from('bids')
+      .where({user_id: id})
+      .returning('*')
+
+    return Lot
       .query()
-      .where('user_id', '=', user.id)
+      .where('user_id', '=', id)
+      .orWhereIn('id', myBidedLots.map(({id}) => id))
       .paginate(page)
   }
 }

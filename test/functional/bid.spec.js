@@ -453,3 +453,4 @@ test('DELETE 403 bid for closed lot cannot deleted', async ({ client }) => {
 
   resp.assertStatus(403);
 });
+
