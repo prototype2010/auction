@@ -184,15 +184,15 @@ class LotController {
     const {id} = await auth.getUser();
 
     const myBidedLots = await Database
-      .select('*')
+      .select('lot_id')
       .from('bids')
       .where({user_id: id})
-      .returning('*')
+
 
     return Lot
       .query()
       .where('user_id', '=', id)
-      .orWhereIn('id', myBidedLots.map(({id}) => id))
+      .orWhereIn('id', myBidedLots.map(({lot_id}) => lot_id))
       .paginate(page)
   }
 }

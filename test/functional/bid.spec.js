@@ -454,3 +454,27 @@ test('DELETE 403 bid for closed lot cannot deleted', async ({ client }) => {
   resp.assertStatus(403);
 });
 
+test('Bided lot should appear in my lots', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.lot_id = lot.id;
+  bid.proposed_price = lot.currentPrice + 1;
+
+  await bidderUser.bids().save(bid);
+
+  const resp = await client.get('/lots/my')
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  const bidedLot = resp.body.data.find(({ id }) => id === bid.lot_id);
+
+  assert.equal(bidedLot.id, lot.id);
+})
