@@ -3,9 +3,12 @@ const Event = use('Event');
 const Mail = use('Mail');
 const APP_EMAIL = Env.get('SUPPORT_MAIL');
 const Redis = use('Redis');
+const Lot = use('App/Models/Lot');
+const Bid = use('App/Models/Bid');
 const { LotsQueue } = use('LotsManager');
 const { BidsQueue } = use('BidsManager');
 const { getDiffMillisecondsFromNow } = use('TimeUtils');
+
 
 Event.on('bid::new', async bid => {
   BidsQueue.add(bid, { delay: 0 });
@@ -48,6 +51,20 @@ Event.on('lot::closed', async lot => {
 
 });
 Event.on('lot::closedByTime', async lot => {
+  const closedLot = Lot.findBy({id: lot.id});
+
+  const topBid = await Bid
+    .query()
+    .where('lot_id', '=', lot.id)
+    .orderBy('proposed_price', 'desc')
+    .first()
+
+  if(topBid) {
+    closedLot.winner_id = topBid.user_id;
+    await closedLot.save();
+
+    Event.fire('lot::closed', closedLot);
+  }
 
 
 });
