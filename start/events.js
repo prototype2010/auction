@@ -43,7 +43,14 @@ Event.on('user::passwordLost', async user => {
 });
 
 /* eslint-disable */
-Event.on('lot::closed', async lot => {});
+Event.on('lot::closed', async lot => {
+
+
+});
+Event.on('lot::closedByTime', async lot => {
+
+
+});
 /* eslint-enable */
 
 Event.on('lot::new', async lot => {
