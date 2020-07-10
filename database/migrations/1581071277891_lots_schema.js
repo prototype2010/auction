@@ -17,12 +17,12 @@ class LotsSchema extends Schema {
       table.float('estimatedPrice', { precision: 2 });
       table.timestamp('startTime');
       table.timestamp('endTime');
-      // table
-      //   .integer('winner_id')
-      //   .notNullable()
-      //   .references('id')
-      //   .inTable('users')
-      //   .onDelete('CASCADE');
+      table
+        .integer('winner_id')
+        .defaultTo(null)
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE');
       table.timestamps();
     });
   }

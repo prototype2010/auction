@@ -429,7 +429,7 @@ test('After creating lot correct event is fired', async ({ assert, client }) => 
   const { event, data } = Event.recent();
 
   assert.equal(event, 'lot::new');
-  assert.deepEqual(data[0].toJSON(), newLot);
+  assert.equal(data[0].id, newLot.id);
 
   Event.restore();
 });

@@ -12,7 +12,7 @@ const BidsQueue = new Bull('bids', {
 
 BidsQueue.process(async job => {
 
-  const { proposed_price, lot_id } = job.data
+  const { proposed_price, lot_id, user_id} = job.data
 
   const lot = await Lot.findBy({id: Number(lot_id)});
 
@@ -24,6 +24,8 @@ BidsQueue.process(async job => {
 
     if(Number(proposed_price) >= lot.estimatedPrice) {
       lot.status = 'closed';
+      lot.winner_id = user_id;
+
       Event.fire('lot::closed', lot);
     }
 
