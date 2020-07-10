@@ -560,3 +560,32 @@ test('Winner should be correct between several bidders', async ({ client, assert
 
   assert.equal(closedLot.winner_id, bidderUser2.id);
 });
+
+test('Close by time event choose correct winner', async ({ assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const bidderUser2 = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+  bid.lot_id = lot.id;
+  bid.proposed_price = lot.currentPrice + 1;
+
+  await bidderUser.bids().save(bid);
+
+  const bid2 = await Factory.model('App/Models/Bid').make();
+  bid2.lot_id = lot.id;
+  bid2.proposed_price = lot.currentPrice + 1;
+
+  await bidderUser2.bids().save(bid2);
+
+  await waitFor(200);
+
+  const closedLot = await Lot.find(lot.id);
+
+  assert.equal(closedLot.winner_id, bidderUser2.id);
+}).timeout(0);

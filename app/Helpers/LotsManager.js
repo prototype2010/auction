@@ -20,6 +20,7 @@ LotsQueue.process(async job => {
 
   if(lot) {
     if((moment().isAfter(lot.startTime) || moment().isSame(moment(lot.startTime)) )) {
+      //start lot
       lot.status = 'inProcess';
       await lot.save();
       const lotEndTimeTask = TimeUtils.getDiffMillisecondsFromNow(lot.endTime)
@@ -31,8 +32,21 @@ LotsQueue.process(async job => {
     } else if(moment(lot.endTime).isAfter(moment()) || moment().isSame(moment(lot.endTime)) ) {
       // close lot by time
       lot.status = 'closed';
+
+      const topBid = await Bid
+        .query()
+        .where('lot_id', '=', lot.id)
+        .orderBy('proposed_price', 'desc')
+        .first()
+
+      if(topBid) {
+        lot.winner_id = topBid.user_id;
+        await closedLot.save();
+
+      }
+
       await lot.save();
-      Event.fire('lot::closedByTime', lot);
+      Event.fire('lot::closed', lot);
     }
   }
 

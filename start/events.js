@@ -51,25 +51,6 @@ Event.on('lot::closed', async lot => {
 
 });
 
-
-Event.on('lot::closedByTime', async lot => {
-  const closedLot = Lot.findBy({id: lot.id});
-
-  const topBid = await Bid
-    .query()
-    .where('lot_id', '=', lot.id)
-    .orderBy('proposed_price', 'desc')
-    .first()
-
-  if(topBid) {
-    closedLot.winner_id = topBid.user_id;
-    await closedLot.save();
-
-    Event.fire('lot::closed', closedLot);
-  }
-});
-/* eslint-enable */
-
 Event.on('lot::new', async lot => {
   const serializedLot = lot.toJSON();
 
