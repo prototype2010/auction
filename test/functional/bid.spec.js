@@ -356,6 +356,78 @@ test('Raise bid should throw raise event', async ({ client, assert }) => {
   Event.restore();
 });
 
+test('Bid lot with estimated price should close the lot', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: lot.estimatedPrice,
+    })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  await waitFor(200);
+
+  const closedLot = await Lot.find(lot.id);
+
+  assert.equal(closedLot.status, 'closed');
+});
+
+test('Bid lot with over estimated price should close the lot', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: lot.estimatedPrice + 100,
+    })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  await waitFor(200);
+
+  const closedLot = await Lot.find(lot.id);
+
+  assert.equal(closedLot.status, 'closed');
+});
+
+test('Bid lot with lower estimated price should not close the lot', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: lot.currentPrice + 1,
+    })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  await waitFor(200);
+
+  const closedLot = await Lot.find(lot.id);
+
+  assert.equal(closedLot.status, 'inProcess');
+});
+
 test('After raise lot current price should be higher', async ({ client, assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();

@@ -20,7 +20,6 @@ BidsQueue.process(async job => {
 
     if(Number(proposed_price) > lot.currentPrice) {
       lot.currentPrice = proposed_price;
-      Event.fire('lot::raised', lot);
     }
 
     if(Number(proposed_price) >= lot.estimatedPrice) {
