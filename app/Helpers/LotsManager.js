@@ -32,11 +32,11 @@ LotsQueue.process(async job => {
 
 LotsQueue.on('completed', async job => {
 
-  const lot = await Lot.find(job.data.id);
-
-  if(lot && lot.status === 'inProcess') {
-
-  }
+  // const lot = await Lot.find(job.data.id);
+  //
+  // if(lot && lot.status === 'inProcess') {
+  //
+  // }
 });
 
 module.exports = {

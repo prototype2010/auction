@@ -1,5 +1,6 @@
 /* eslint-disable */
 const Bull = require('bull');
+const Event = use('Event');
 const Lot = use('App/Models/Lot');
 
 const BidsQueue = new Bull('bids', {
@@ -15,8 +16,17 @@ BidsQueue.process(async job => {
 
   const lot = await Lot.findBy({id: Number(lot_id)});
 
-  if(lot && Number(proposed_price) > lot.currentPrice) {
-    lot.currentPrice = proposed_price;
+  if(lot && lot.status === 'inProcess') {
+
+    if(Number(proposed_price) > lot.currentPrice) {
+      lot.currentPrice = proposed_price;
+      Event.fire('lot::raised', lot);
+    }
+
+    if(Number(proposed_price) >= lot.estimatedPrice) {
+      lot.status = 'closed';
+      Event.fire('lot::closed', lot);
+    }
 
     await lot.save();
   }
