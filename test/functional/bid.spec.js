@@ -526,3 +526,37 @@ test('Bided lot should appear in my lots', async ({ client, assert }) => {
 
   assert.equal(bidedLot.id, lot.id);
 });
+
+
+test('Winner should be correct between several bidders', async ({ client, assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const bidderUser2 = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: lot.estimatedPrice - 1,
+    })
+    .loginVia(bidderUser.toJSON(), 'jwt')
+    .end();
+
+  await client.post('/bids')
+    .send({
+      lotId: lot.id,
+      proposedPrice: lot.estimatedPrice,
+    })
+    .loginVia(bidderUser2.toJSON(), 'jwt')
+    .end();
+
+  await waitFor(200);
+
+  const closedLot = await Lot.find(lot.id);
+
+  assert.equal(closedLot.winner_id, bidderUser2.id);
+});
