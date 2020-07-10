@@ -50,6 +50,8 @@ Event.on('lot::closed', async lot => {
 
 
 });
+
+
 Event.on('lot::closedByTime', async lot => {
   const closedLot = Lot.findBy({id: lot.id});
 
