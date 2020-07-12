@@ -539,24 +539,16 @@ test('Lot with updated time didn\'t become active', async ({ assert, client }) =
 });
 
 test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
-  const user = await createUser();
-  const lot = await createLot({
-    startTime: moment().toISOString(),
-    endTime: moment().add(1, 'hours').toISOString(),
-  });
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
 
-  const lotResponse = await client.post('/lots')
-    .send(lot.toJSON())
+  lot.status = 'inProcess';
+
+  await creatorUser.lots().save(lot);
+
+  const gottenById = await client.delete(`/lots/${lot.id}`)
     .loginVia(user.toJSON(), 'jwt')
     .end();
-
-
-  await waitFor(100);
-
-  const gottenById = await client.delete(`/lots/${lotResponse.body.id}`)
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
-
 
   assert.equal(gottenById.status, 403);
 });
