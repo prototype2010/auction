@@ -1,16 +1,19 @@
 'use strict';
 
+const moment = require('moment');
+
 const { test, trait } = use('Test/Suite')('Bid');
 const Factory = use('Factory');
+const Bid = use('App/Models/Bid');
+const Lot = use('App/Models/Lot');
+const { LotListener } = use('App/Listeners/LotListener');
+const Event = use('Event');
+
+const { getDBRowsNumber, waitFor } = require('../utils');
 
 trait('Test/ApiClient');
 trait('Auth/Client');
 
-const Bid = use('App/Models/Bid');
-const Lot = use('App/Models/Lot');
-const Event = use('Event');
-
-const { getDBRowsNumber, waitFor } = require('../utils');
 
 trait('Test/ApiClient');
 
@@ -568,6 +571,7 @@ test('Close by time event choose correct winner', async ({ assert }) => {
   const lot = await Factory.model('App/Models/Lot').make();
 
   lot.status = 'inProcess';
+  lot.endTime = moment().subtract(1, 'minute');
 
   await creatorUser.lots().save(lot);
 
@@ -583,7 +587,9 @@ test('Close by time event choose correct winner', async ({ assert }) => {
 
   await bidderUser2.bids().save(bid2);
 
-  await waitFor(200);
+  await LotListener.updateLot(lot);
+
+  await waitFor(2000);
 
   const closedLot = await Lot.find(lot.id);
 
