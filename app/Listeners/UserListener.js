@@ -3,12 +3,6 @@ const APP_EMAIL = Env.get('SUPPORT_MAIL');
 const Mail = use('Mail');
 
 class UserListener {
-  static NEW_USER_EVENT = 'user::new'
-
-  static PASSWORD_CHANGED = 'user::passwordChanged'
-
-  static PASSWORD_LOST = 'user::passwordLost'
-
   static async newUser(user) {
     await Mail.send('emails.welcome', user, message => {
       message
@@ -41,4 +35,10 @@ class UserListener {
   }
 }
 
-module.exports = UserListener;
+const USER_EVENTS = {
+  NEW_USER_EVENT: 'user::new',
+  PASSWORD_CHANGED: 'user::passwordChanged',
+  PASSWORD_LOST: 'user::passwordLost',
+};
+
+module.exports = { UserListener, USER_EVENTS };

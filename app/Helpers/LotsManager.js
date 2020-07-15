@@ -4,12 +4,7 @@ const moment = require('moment');
 const Lot = use('App/Models/Lot');
 const TimeUtils = use('TimeUtils');
 
-const LotsQueue = new Bull('lots', {
-  limiter: {
-    max: 100,
-    duration: 1000,
-  },
-});
+const LotsQueue = new Bull('lots');
 
 LotsQueue.process(async job => {
 

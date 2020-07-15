@@ -3,20 +3,12 @@ const { getDiffMillisecondsFromNow } = use('TimeUtils');
 const { LotsQueue } = use('LotsManager');
 
 class LotListener {
-  static LOT_NEW = 'lot::new'
-
-  static LOT_CLOSE = 'lot::closed'
-
-  static LOT_UPDATE = 'lot::update'
-
-  static LOT_DELETE = 'lot::delete'
-
   static async newLot(lot) {
     const serializedLot = lot.toJSON();
 
     await Redis.set(lot.id, serializedLot);
 
-    const lotTaskDelay = getDiffMillisecondsFromNow(serializedLot.startTime);
+    const lotTaskDelay = getDiffMillisecondsFromNow(lot.startTime);
 
     LotsQueue.add(serializedLot, { delay: lotTaskDelay });
   }
@@ -34,4 +26,11 @@ class LotListener {
   }
 }
 
-module.exports = LotListener;
+const LOT_EVENTS = {
+  LOT_NEW : 'lot::new',
+  LOT_CLOSE:'lot::closed',
+  LOT_UPDATE :'lot::update',
+  LOT_DELETE :'lot::delete',
+}
+
+module.exports = { LotListener, LOT_EVENTS };

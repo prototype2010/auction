@@ -2,6 +2,7 @@
 const { test, trait } = use('Test/Suite')('Lot');
 const Factory = use('Factory');
 const Lot = use('App/Models/Lot');
+const {LotListener} = use('App/Listeners/LotListener');
 const Event = use('Event');
 
 trait('Test/ApiClient');
@@ -484,22 +485,19 @@ test('After delete lot correct event is fired', async ({ assert, client }) => {
 });
 
 test('Lot becomes active', async ({ assert, client }) => {
-  const user = await createUser();
-  const lot = await createLot({
-    startTime: moment().toISOString(),
-    endTime: moment().add(1, 'hours').toISOString(),
-  });
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
 
-  const { body } = await client.post('/lots')
-    .send(lot.toJSON())
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
+  lot.startTime = moment().toISOString();
 
+  await creatorUser.lots().save(lot);
+
+  await LotListener.newLot(lot);
 
   await waitFor(2000);
 
-  const activeLot = await client.get(`/lots/${body.id}`)
-    .loginVia(user.toJSON(), 'jwt')
+  const activeLot = await client.get(`/lots/${lot.id}`)
+    .loginVia(creatorUser.toJSON(), 'jwt')
     .end();
 
   assert.equal(activeLot.body.status, 'inProcess');
