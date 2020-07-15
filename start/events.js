@@ -1,47 +1,18 @@
-const Env = use('Env');
 const Event = use('Event');
-const Mail = use('Mail');
-const APP_EMAIL = Env.get('SUPPORT_MAIL');
 const Redis = use('Redis');
 const { LotsQueue } = use('LotsManager');
 const { BidsQueue } = use('BidsManager');
 const { getDiffMillisecondsFromNow } = use('TimeUtils');
+const UserListener = use('App/Listeners/UserListener');
 
 
 Event.on('bid::new', async bid => {
   BidsQueue.add(bid, { delay: 0 });
 });
 
-Event.on('user::new', async user => {
-  await Mail.send('emails.welcome', user, message => {
-    message
-      .to(user.email)
-      .from(APP_EMAIL)
-      .subject('Welcome to yardstick');
-  });
-});
-
-Event.on('user::passwordChanged', async user => {
-  await Mail.send('emails.passwordChanged', user, message => {
-    message
-      .to(user.email)
-      .from(APP_EMAIL)
-      .subject('Password changed successfully');
-  });
-});
-
-Event.on('user::passwordLost', async user => {
-  await Mail.send(
-    'emails.initiatePasswordReset',
-    { ...user.toJSON(), passwordRecoveryToken: user.passwordRecoveryToken },
-    message => {
-      message
-        .to(user.email)
-        .from(APP_EMAIL)
-        .subject('Recovery password process');
-    },
-  );
-});
+Event.on(UserListener.NEW_USER_EVENT, UserListener.newUser);
+Event.on(UserListener.PASSWORD_CHANGED, UserListener.passwordChanged);
+Event.on(UserListener.PASSWORD_LOST, UserListener.passwordLost);
 
 /* eslint-disable */
 Event.on('lot::closed', async lot => {
