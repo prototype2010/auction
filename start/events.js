@@ -1,12 +1,11 @@
 const Event = use('Event');
-const { BidsQueue } = use('BidsManager');
+
 const UserListener = use('App/Listeners/UserListener');
 const LotListener = use('App/Listeners/LotListener');
+const BidListener = use('App/Listeners/BidListener');
 
 
-Event.on('bid::new', async bid => {
-  BidsQueue.add(bid, { delay: 0 });
-});
+Event.on(BidListener.BID_NEW, BidListener.bidAdd);
 
 Event.on(UserListener.NEW_USER_EVENT, UserListener.newUser);
 Event.on(UserListener.PASSWORD_CHANGED, UserListener.passwordChanged);
