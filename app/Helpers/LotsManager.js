@@ -25,11 +25,15 @@ LotsQueue.process(async job => {
       await lot.save();
       const lotEndTimeTask = TimeUtils.getDiffMillisecondsFromNow(lot.endTime)
       LotsQueue.add(lot, { delay: lotEndTimeTask });
-    } else if(moment(lot.startTime).isAfter(moment())) {
+    }
+
+    if(moment(lot.startTime).isAfter(moment())) {
       // restart lot on update
       const newStartTime = TimeUtils.getDiffMillisecondsFromNow(lot.startTime)
       LotsQueue.add(lot, { delay: newStartTime });
-    } else if(moment(lot.endTime).isAfter(moment()) || moment().isSame(moment(lot.endTime)) ) {
+    }
+
+    if(moment(lot.endTime).isAfter(moment()) || moment().isSame(moment(lot.endTime)) ) {
       // close lot by time
       lot.status = 'closed';
 

@@ -496,14 +496,14 @@ test('Lot becomes active', async ({ assert, client }) => {
     .end();
 
 
-  await waitFor(100);
+  await waitFor(2000);
 
   const activeLot = await client.get(`/lots/${body.id}`)
     .loginVia(user.toJSON(), 'jwt')
     .end();
 
   assert.equal(activeLot.body.status, 'inProcess');
-});
+}).timeout(0);
 
 
 test('Lot with updated time didn\'t become active', async ({ assert, client }) => {
@@ -547,7 +547,7 @@ test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
   await creatorUser.lots().save(lot);
 
   const gottenById = await client.delete(`/lots/${lot.id}`)
-    .loginVia(user.toJSON(), 'jwt')
+    .loginVia(creatorUser.toJSON(), 'jwt')
     .end();
 
   assert.equal(gottenById.status, 403);
