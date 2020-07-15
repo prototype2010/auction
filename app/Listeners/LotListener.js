@@ -5,7 +5,7 @@ const { LotsQueue } = use('LotsManager');
 class LotListener {
   static LOT_NEW = 'lot::new'
 
-  static LOT_CLOSED = 'lot::closed'
+  static LOT_CLOSE = 'lot::closed'
 
   static LOT_UPDATE = 'lot::update'
 
@@ -27,6 +27,10 @@ class LotListener {
 
   static async deleteLot(lot) {
     await Redis.del(lot.id, JSON.stringify(lot));
+  }
+  /* eslint-disable */
+  static async closeLot(lot) {
+
   }
 }
 
