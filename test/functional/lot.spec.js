@@ -552,31 +552,24 @@ test('Lot inProcess lot cannot be deleted', async ({ assert, client }) => {
 });
 
 test('PUT 403 Lot inProcess lot cannot be updated', async ({ assert, client }) => {
-  const user = await createUser();
-  const lot = await createLot({
-    startTime: moment().toISOString(),
-    endTime: moment().add(1, 'hours').toISOString(),
-  });
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
 
-  const lotResponse = await client.post('/lots')
-    .send(lot.toJSON())
-    .loginVia(user.toJSON(), 'jwt')
-    .end();
+  lot.status = 'inProcess';
 
+  await creatorUser.lots().save(lot);
 
-  await waitFor(100);
-
-  const deleteAttempt = await client.put(`/lots/${lotResponse.body.id}`)
+  const updateAttempt = await client.put(`/lots/${lot.id}`)
     .send({
       ...lot.toJSON(),
       startTime: moment().add(1, 'hours').toISOString(),
       endTime: moment().add(1, 'day').toISOString(),
     })
-    .loginVia(user.toJSON(), 'jwt')
+    .loginVia(creatorUser.toJSON(), 'jwt')
     .end();
 
 
-  assert.equal(deleteAttempt.status, 403);
+  assert.equal(updateAttempt.status, 403);
 });
 
 test('GET 200 My lost works fine', async ({ assert, client }) => {
