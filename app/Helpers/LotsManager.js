@@ -3,6 +3,7 @@ const Bull = require('bull');
 const Lot = use('App/Models/Lot');
 const { getDiffMillisecondsFromNow, shouldBeStartedNow, shouldBeRestartedNow, shouldBeClosedByTime } = use('TimeUtils');
 const Bid = use('App/Models/Bid');
+const {LOT_EVENTS} = use('App/Listeners/LotListener');
 
 const LotsQueue = new Bull('lots');
 
@@ -43,7 +44,7 @@ LotsQueue.process(async job => {
       }
 
       await lot.save();
-      Event.fire('lot::closed', lot);
+      Event.fire(LOT_EVENTS.LOT_CLOSE, lot);
     }
   }
 

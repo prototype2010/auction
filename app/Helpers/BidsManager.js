@@ -2,6 +2,8 @@
 const Bull = require('bull');
 const Event = use('Event');
 const Lot = use('App/Models/Lot');
+const {LOT_EVENTS} = use('App/Listeners/LotListener');
+
 
 const BidsQueue = new Bull('bids', {
   limiter: {
@@ -26,7 +28,7 @@ BidsQueue.process(async job => {
       lot.status = 'closed';
       lot.winner_id = user_id;
 
-      Event.fire('lot::closed', lot);
+      Event.fire(LOT_EVENTS.LOT_CLOSE, lot);
     }
 
     await lot.save();

@@ -4,6 +4,7 @@ const Database = use('Database');
 const Helpers = use('Helpers')
 const uid = require('uid');
 const Event = use('Event');
+const {LOT_EVENTS} = use('App/Listeners/LotListener');
 
 class LotController {
 
@@ -49,7 +50,7 @@ class LotController {
 
     await lot.save();
 
-    Event.fire('lot::new', lot);
+    Event.fire(LOT_EVENTS.LOT_NEW, lot);
 
     return Lot.find(lot.id);
   }
@@ -114,7 +115,7 @@ class LotController {
 
       await lot.save();
 
-      Event.fire('lot::update', lot);
+      Event.fire(LOT_EVENTS.LOT_UPDATE, lot);
 
       return lot;
 
@@ -168,7 +169,7 @@ class LotController {
     } else {
       await lot.delete();
 
-      Event.fire('lot::delete', lot);
+      Event.fire(LOT_EVENTS.LOT_DELETE, lot);
 
       response
         .status(200)

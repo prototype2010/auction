@@ -2,7 +2,8 @@
 const { test, trait } = use('Test/Suite')('Lot');
 const Factory = use('Factory');
 const Lot = use('App/Models/Lot');
-const {LotListener} = use('App/Listeners/LotListener');
+const {LotListener, LOT_EVENTS} = use('App/Listeners/LotListener');
+
 const Event = use('Event');
 
 trait('Test/ApiClient');
@@ -429,7 +430,7 @@ test('After creating lot correct event is fired', async ({ assert, client }) => 
 
   const { event, data } = Event.recent();
 
-  assert.equal(event, 'lot::new');
+  assert.equal(event, LOT_EVENTS.LOT_NEW);
   assert.equal(data[0].id, newLot.id);
 
   Event.restore();
@@ -454,7 +455,7 @@ test('After updating lot correct event is fired', async ({ assert, client }) => 
     .end();
   const { event, data } = Event.recent();
 
-  assert.equal(event, 'lot::update');
+  assert.equal(event, LOT_EVENTS.LOT_UPDATE);
   assert.deepEqual(data[0].toJSON(), lotResponse.body);
 
   Event.restore();
@@ -478,7 +479,7 @@ test('After delete lot correct event is fired', async ({ assert, client }) => {
 
   const { event, data } = Event.recent();
 
-  assert.equal(event, 'lot::delete');
+  assert.equal(event, LOT_EVENTS.LOT_DELETE);
   assert.deepEqual(JSON.stringify(data[0]), JSON.stringify(lotResponse.body)); // without .stringify does not work. Fucking adonis !!!
 
   Event.restore();
