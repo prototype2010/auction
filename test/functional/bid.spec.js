@@ -564,7 +564,7 @@ test('Winner should be correct between several bidders', async ({ client, assert
   assert.equal(closedLot.winner_id, bidderUser2.id);
 });
 
-test('Close by time event choose correct winner', async ({ assert }) => {
+test('Close by time event chooses correct winner', async ({ assert }) => {
   const creatorUser = await Factory.model('App/Models/User').create();
   const bidderUser = await Factory.model('App/Models/User').create();
   const bidderUser2 = await Factory.model('App/Models/User').create();
@@ -583,15 +583,47 @@ test('Close by time event choose correct winner', async ({ assert }) => {
 
   const bid2 = await Factory.model('App/Models/Bid').make();
   bid2.lot_id = lot.id;
-  bid2.proposed_price = lot.currentPrice + 1;
+  bid2.proposed_price = lot.currentPrice + 2;
 
   await bidderUser2.bids().save(bid2);
 
   await LotListener.updateLot(lot);
 
-  await waitFor(2000);
+  await waitFor(500);
 
   const closedLot = await Lot.find(lot.id);
 
   assert.equal(closedLot.winner_id, bidderUser2.id);
+});
+
+test('Close by time event chooses correct winner between equal bets', async ({ assert }) => {
+  const creatorUser = await Factory.model('App/Models/User').create();
+  const bidderUser = await Factory.model('App/Models/User').create();
+  const bidderUser2 = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  lot.status = 'inProcess';
+  lot.endTime = moment().subtract(1, 'minute');
+
+  await creatorUser.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+  bid.lot_id = lot.id;
+  bid.proposed_price = lot.currentPrice;
+
+  await bidderUser.bids().save(bid);
+
+  const bid2 = await Factory.model('App/Models/Bid').make();
+  bid2.lot_id = lot.id;
+  bid2.proposed_price = lot.currentPrice;
+
+  await bidderUser2.bids().save(bid2);
+
+  await LotListener.updateLot(lot);
+
+  await waitFor(500);
+
+  const closedLot = await Lot.find(lot.id);
+
+  assert.equal(closedLot.winner_id, bidderUser.id);
 }).timeout(0);

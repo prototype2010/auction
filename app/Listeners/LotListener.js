@@ -15,6 +15,8 @@ class LotListener {
 
   static async updateLot(lot) {
     await Redis.set(lot.id, JSON.stringify(lot));
+
+    LotsQueue.add(lot);
   }
 
   static async deleteLot(lot) {
@@ -22,7 +24,6 @@ class LotListener {
   }
   /* eslint-disable */
   static async closeLot(lot) {
-
   }
 }
 

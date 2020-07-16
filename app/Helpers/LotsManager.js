@@ -3,6 +3,7 @@ const Bull = require('bull');
 const moment = require('moment');
 const Lot = use('App/Models/Lot');
 const TimeUtils = use('TimeUtils');
+const Bid = use('App/Models/Bid');
 
 const LotsQueue = new Bull('lots');
 
@@ -34,13 +35,14 @@ LotsQueue.process(async job => {
 
       const topBid = await Bid
         .query()
-        .where('lot_id', '=', lot.id)
+        .where({lot_id: lot.id})
         .orderBy('proposed_price', 'desc')
+        .orderBy('created_at', 'asc')
         .first()
 
       if(topBid) {
         lot.winner_id = topBid.user_id;
-        await closedLot.save();
+        await lot.save();
 
       }
 
@@ -50,19 +52,9 @@ LotsQueue.process(async job => {
   }
 
 
-
   job.progress(100);
 
   return true;
-});
-
-LotsQueue.on('completed', async job => {
-
-  // const lot = await Lot.find(job.data.id);
-  //
-  // if(lot && lot.status === 'inProcess') {
-  //
-  // }
 });
 
 module.exports = {
