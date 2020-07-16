@@ -1,5 +1,9 @@
 const User = use('App/Models/User');
 const Event = use('Event');
+
+const moment = require('moment');
+const uid = require('uid');
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -45,19 +49,10 @@ class UserController {
    * @param {View} ctx.view
    */
 
-  async show({ params, auth, response }) {
-    const { id } = params;
-
+  async profile({ auth }) {
     const authUser = await auth.getUser();
 
-    if (authUser.id !== parseInt(id, 10)) {
-      return response.send({
-        status: 403,
-        message: "You can't see someone's info",
-      });
-    }
-
-    const user = await User.find(id);
+    const user = await User.find(authUser.id);
 
     return user;
   }
@@ -92,35 +87,86 @@ class UserController {
     const authUser = await auth.getUser();
 
     if (authUser.id !== parseInt(id, 10)) {
-      response.status(403);
-
-      response.send({
+      response.status(403).send({
         status: 403,
         message: "You can't update someone's info",
       });
     }
 
-    authUser.email = email;
-    authUser.password = password;
-    authUser.firstname = firstname;
-    authUser.lastname = lastname;
-    authUser.phone = phone;
-    authUser.birthday = birthday;
-
-    await authUser.save();
+    await authUser.merge({
+      email,
+      password,
+      firstname,
+      lastname,
+      phone,
+      birthday,
+    });
 
     return authUser;
   }
 
-  /**
-   * Delete a user with id.
-   * DELETE users/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  // async destroy ({ params, request, response }) {}
+  async login({ auth, request }) {
+    const { email, password } = request.only(['email', 'password']);
+
+    const tokenInfo = await auth.withRefreshToken().attempt(email, password);
+
+    return tokenInfo;
+  }
+
+  async refresh({ auth, request }) {
+    const refreshToken = request.header('refresh_token');
+    const newTokenInfo = await auth
+      .newRefreshToken()
+      .generateForRefreshToken(refreshToken, true);
+
+    return newTokenInfo;
+  }
+
+  async logout({ auth, response }) {
+    const user = await auth.getUser();
+
+    await auth
+      .authenticator('jwt')
+      .revokeTokensForUser(user);
+
+    response.status(200).send({ message: 'Logged out successfully' });
+  }
+
+  async initiatePasswordReset({ request, response }) {
+    const { email } = request.only(['email']);
+
+    const user = await User.findByOrFail('email', email);
+
+    user.passwordRecoveryToken = uid(32);
+    user.tokenExpirationDate = moment().add(24, 'hours');
+    await user.save();
+
+    Event.fire('user::passwordLost', user);
+
+    response.status(200).send({ message: 'ok' });
+  }
+
+  async applyPasswordRecovery({ response, params, request }) {
+    const { token } = params;
+
+    const { password } = request.only([
+      'password',
+    ]);
+
+
+    const user = await User.findByOrFail({ passwordRecoveryToken: token });
+
+    if (moment().isBefore(moment(user.tokenExpirationDate))) {
+      user.password = password;
+      user.passwordRecoveryToken = null;
+
+      await user.save();
+
+      await Event.fire('user::passwordChanged', user);
+
+      response.send({ message: 'Password changed successfully' });
+    }
+  }
 }
 
 module.exports = UserController;

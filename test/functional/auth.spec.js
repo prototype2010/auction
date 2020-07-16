@@ -9,7 +9,6 @@ const {
   createUserWithParams,
   getUserToken,
   getRecentEmail,
-  getPasswordFromLastEmail,
   getRecoveryTokenFromLastEmail,
 } = require('../utils');
 
@@ -18,7 +17,8 @@ test('POST users.auth (200) User can receive token', async ({
   assert,
 }) => {
   const password = 'XXXXXXXXXX';
-  const createdUserResponse = await createUserWithParams(client, { password });
+  const createdUserResponse = await createUserWithParams(client,
+    { password, repeatPassword: password });
   const { body: user } = createdUserResponse;
 
   const authAttempt = await client
@@ -252,7 +252,8 @@ test('Event will be fired for correct user', async ({ client, assert }) => {
   Event.restore();
 });
 
-test('Email contains recovery code', async ({ client, assert }) => {
+
+test('Email contains recovery url', async ({ client, assert }) => {
   const { body: user } = await createUserWithParams(client);
   const { email } = user;
 
@@ -265,14 +266,27 @@ test('Email contains recovery code', async ({ client, assert }) => {
 
   const lastEmail = await getRecentEmail();
 
-  const recoveryToken = await getRecoveryTokenFromLastEmail();
-
   assert.isTrue(
     lastEmail.message.html.includes(
       `users/auth/lost-password/${passwordRecoveryToken}`,
     ),
   );
-  assert.equal(recoveryToken, passwordRecoveryToken); // this should be the same
+});
+
+test('Email recovery token matches', async ({ client, assert }) => {
+  const { body: user } = await createUserWithParams(client);
+  const { email } = user;
+
+  await client
+    .post('/users/auth/password-recovery')
+    .send({ email })
+    .end();
+
+  const { passwordRecoveryToken } = await User.findBy('email', email);
+
+  const recoveryToken = await getRecoveryTokenFromLastEmail();
+
+  assert.equal(recoveryToken, passwordRecoveryToken);
 });
 
 test('GET password-recovery (200) Recovery code gives correct response', async ({
@@ -289,8 +303,11 @@ test('GET password-recovery (200) Recovery code gives correct response', async (
 
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
+  const password = 'im new password';
+
   const response = await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({ email, password, repeatPassword: password })
     .end();
 
   response.assertStatus(200);
@@ -313,8 +330,15 @@ test('POST users/auth/login Correct event will be fired', async ({
 
   Event.fake();
 
+  const newPassword = 'newPassword$$$';
+
   await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({
+      email,
+      password: newPassword,
+      repeatPassword: newPassword,
+    })
     .end();
 
   const { data: userDataArray, event } = Event.recent();
@@ -323,7 +347,7 @@ test('POST users/auth/login Correct event will be fired', async ({
   assert.equal(userDataArray[0].email, user.email);
 
   Event.restore();
-});
+}).timeout(0);
 
 test('POST users/auth/password-recovery (200) Password after recovery works fine', async ({ client }) => {
   const { body: user } = await createUserWithParams(client);
@@ -336,11 +360,16 @@ test('POST users/auth/password-recovery (200) Password after recovery works fine
 
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
-  await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
-    .end();
+  const newPassword = 'im new password';
 
-  const newPassword = await getPasswordFromLastEmail();
+  await client
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({
+      email,
+      password: newPassword,
+      repeatPassword: newPassword,
+    })
+    .end();
 
   const response = await client
     .post('/users/auth/login')
@@ -351,7 +380,7 @@ test('POST users/auth/password-recovery (200) Password after recovery works fine
     .end();
 
   response.assertStatus(200);
-});
+}).timeout(0);
 
 test('POST users/auth/password-recovery (404) Incorrect token returns error', async ({ client }) => {
   const { body: user } = await createUserWithParams(client);
@@ -378,13 +407,16 @@ test('POST users/auth/password-recovery (200) Protected data can be reached', as
     .send({ email })
     .end();
 
+
+  const newPassword = 'im new password';
+
   const passwordRecoveryToken = await getRecoveryTokenFromLastEmail();
 
   await client
-    .get(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .post(`users/auth/password-recovery/${passwordRecoveryToken}`)
+    .send({ email, password: newPassword, repeatPassword: newPassword })
     .end();
 
-  const newPassword = await getPasswordFromLastEmail();
 
   const response = await client
     .post('/users/auth/login')
@@ -402,4 +434,4 @@ test('POST users/auth/password-recovery (200) Protected data can be reached', as
     .end();
 
   protectedRouteResponse.assertStatus(200);
-});
+}).timeout(0);

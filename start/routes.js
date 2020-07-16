@@ -17,19 +17,29 @@
 const Route = use('Route');
 
 Route.group(() => {
-  Route.post('login', 'AuthController.login');
-  Route.post('logout', 'AuthController.logout');
-  Route.post('refresh', 'AuthController.refresh');
-  Route.post('password-recovery', 'AuthController.passwordRecovery');
-  Route.get('password-recovery/:token', 'AuthController.applyPasswordRecovery');
+  Route.post('login', 'UserController.login');
+  Route.post('logout', 'UserController.logout');
+  Route.post('refresh', 'UserController.refresh');
+  Route.post('password-recovery', 'UserController.initiatePasswordReset');
+  Route.post('password-recovery/:token', 'UserController.applyPasswordRecovery').validator('passwordUpdate');
 }).prefix('users/auth');
 
 Route.post('users', 'UserController.store').validator('UserStore');
-//
+Route.get('users/profile', 'UserController.profile').middleware('auth');
+
 Route.resource('users', 'UserController')
-  .only(['show', 'update'])
+  .only(['update'])
   .middleware('auth');
+
+Route.get('lots/my', 'LotController.myLots').middleware('auth');
 
 Route.resource('lots', 'LotController')
   .validator(new Map([[['lots.store'], ['LotStore']]]))
+  .middleware('auth');
+
+Route.resource('bids', 'BidController')
+  .validator(new Map([
+    [['bids.store'], ['BidStore']],
+    [['bids.update'], ['BidStore']],
+  ]))
   .middleware('auth');

@@ -1,24 +1,27 @@
 /* eslint-disable */
 const { test, trait } = use('Test/Suite')('User');
 
+trait('Test/ApiClient');
+trait('Auth/Client');
+
 const User = use('App/Models/User');
 const moment = require('moment');
 const faker = require('faker');
 
-const { createUserWithParams } = require('../utils');
+const { createUserWithParams, getDBRowsNumber } = require('../utils');
 
-trait('Test/ApiClient');
-trait('Auth/Client');
 
-const getDBRowsNumber = async (entity) => {
-  const { rows } = await entity.all();
-  return rows.length;
-};
 
 test('POST user.store (200). User can be created', async ({ client }) => {
   const response = await createUserWithParams(client);
 
   response.assertStatus(200);
+});
+
+test('POST user.store (422). User cannot be created if passwords don\'t match ', async ({ client }) => {
+  const response = await createUserWithParams(client, {repeatPassword : 'something very different'});
+
+  response.assertStatus(422);
 });
 
 test('POST user.store (200). 1 user is being created', async ({
@@ -87,4 +90,21 @@ test("PUT users.update (403) User updates some one's info", async ({
     .end();
 
   response.assertStatus(403);
+});
+
+test("GET users.profile (200) User updates some one's info", async ({
+  client,assert
+}) => {
+  const response = await createUserWithParams(client, {
+    birthday: moment().subtract(30,'years').toISOString(),
+  });
+
+  const profile = await client.get(`/users/profile`)
+    .loginVia(response.body, 'jwt')
+    .end();
+
+  profile.assertStatus(200);
+
+  assert.deepEqual(response.body.id,profile.body.id);
+
 });

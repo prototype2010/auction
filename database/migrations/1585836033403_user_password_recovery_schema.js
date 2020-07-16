@@ -8,7 +8,7 @@ class UserPasswordRecoverySchema extends Schema {
     this.table('users', (table) => {
       table.string('passwordRecoveryToken', 100);
       table.datetime('tokenExpirationDate');
-      table.boolean('isTokenUsed').defaultTo(false);
+      table.boolean('isPasswordUpdateAllowed').defaultTo(false);
     });
   }
 
@@ -16,7 +16,7 @@ class UserPasswordRecoverySchema extends Schema {
     this.table('users', (table) => {
       table.dropColumn('passwordRecoveryToken');
       table.dropColumn('tokenExpirationDate');
-      table.boolean('isTokenUsed');
+      table.boolean('isPasswordUpdateAllowed');
     });
   }
 }

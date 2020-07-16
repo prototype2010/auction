@@ -4,6 +4,10 @@
 const Model = use('Model');
 
 class Lot extends Model {
+  static get table() {
+    return 'lots';
+  }
+
   static get createdAtColumn() {
     return 'created_at';
   }

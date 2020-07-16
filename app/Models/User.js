@@ -12,7 +12,7 @@ class User extends Model {
       'password',
       'passwordRecoveryToken',
       'tokenExpirationDate',
-      'isTokenUsed',
+      'isPasswordUpdateAllowed',
     ];
   }
 
