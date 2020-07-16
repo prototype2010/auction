@@ -41,10 +41,8 @@ class OrderController {
   }
 
 
-  async show({ request, auth }) {
-    const { id } = request.only([
-      'id',
-    ]);
+  async show({ request, auth, params }) {
+    const { id } = params;
 
     const { id: userId } = await auth.getUser();
 
@@ -55,36 +53,92 @@ class OrderController {
       return order;
     }
 
-    request.status(403).message('You cannot see someones\' order');
+    request.status(404).message('Not found');
   }
-  /**
-   * Render a form to update an existing order.
-   * GET orders/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  // async edit ({ params, request, response, view }) {}
-  /**
-   * Update order details.
-   * PUT or PATCH orders/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  // async update ({ params, request, response }) {}
-  /**
-   * Delete a order with id.
-   * DELETE orders/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  // async destroy ({ params, request, response }) {}
+
+  async update({ params, request, auth }) {
+    const { id } = params;
+
+    const { arrivalLocation, arrivalType } = request.only([
+      'id',
+    ]);
+
+    const { id: userId } = await auth.getUser();
+
+    const order = await Order.findByOrFail({ id, user_id: userId });
+
+    if (order.status === 'pending') {
+      order.arrival_location = arrivalLocation;
+      order.arrival_type = arrivalType;
+
+      await order.save();
+
+      return order;
+    }
+
+    request.status(403).message(`You can't update order in ${order.status} status`);
+  }
+
+  async approveSent({ params, request, auth }) {
+    const { id } = params;
+
+    const { id: userId } = await auth.getUser();
+
+    const order = await Order.findByOrFail({ id });
+    const user = await order.user();
+
+    if (order.status === 'pending') {
+      if (user.id === userId) {
+        order.status = 'sent';
+
+        await order.save();
+
+        return order;
+      }
+
+      request.status(403).message('Cannot approve someone\'s orders');
+    }
+
+    request.status(403).message(`Cannot approve order in status ${order.status} status`);
+  }
+
+  async approveDelivered({ params, request, auth }) {
+    const { id } = params;
+
+    const { id: userId } = await auth.getUser();
+
+    const order = await Order.findByOrFail({ id });
+
+    if (order.status === 'sent') {
+      if (order.user_id === userId) {
+        order.status = 'delivered';
+
+        await order.save();
+
+        return order;
+      }
+
+      request.status(403).message('Cannot approve someone\'s orders');
+    }
+
+    request.status(403).message(`Cannot approve order in status ${order.status} status`);
+  }
+
+  async destroy({ params, request, auth }) {
+    const { id } = params;
+
+    const { id: userId } = await auth.getUser();
+
+    const order = await Order.findByOrFail({ id, user_id: userId });
+
+    if (order.status === 'pending') {
+      await order.delete();
+
+      return order;
+    }
+
+    request.status(403).message(`You can't delete order in ${order.status} status`);
+  }
 }
 
 module.exports = OrderController;
