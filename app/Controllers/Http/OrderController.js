@@ -1,52 +1,62 @@
-'use strict';
+const Order = use('App/Models/Order');
+const Lot = use('App/Models/Lot');
 
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
-
-/**
- * Resourceful controller for interacting with orders
- */
 class OrderController {
-  /**
-   * Show a list of all orders.
-   * GET orders
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  // async index ({ request, response, view }) {}
-  /**
-   * Render a form to be used for creating a new order.
-   * GET orders/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  // async create ({ request, response, view }) {}
-  /**
-   * Create/save a new order.
-   * POST orders
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  // async store ({ request, response }) {}
-  /**
-   * Display a single order.
-   * GET orders/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  // async show ({ params, request, response, view }) {}
+  async index({ request, auth }) {
+    const { id } = await auth.getUser();
+    const page = request.get().page || 1;
+
+    return Order
+      .query()
+      .where('owner_id', '=', id)
+      .orWhere('user_id', '=', id)
+      .paginate(page);
+  }
+
+  async store({ request, auth }) {
+    const {
+      lotId,
+      arrivalLocation,
+      arrivalType,
+    } = request.only([
+      'lotId',
+      'arrivalLocation',
+      'arrivalType',
+    ]);
+    const { id: userId } = await auth.getUser();
+
+    await Lot.findByOrFail({ id: lotId, winner_id: userId, status: 'closed' });
+
+    const order = new Order();
+
+    order.status = 'pending';
+    order.user_id = userId;
+    order.lot_id = lotId;
+    order.arrival_location = arrivalLocation;
+    order.arrival_type = arrivalType;
+
+    await order.save();
+
+    return order;
+  }
+
+
+  async show({ request, auth }) {
+    const { id } = request.only([
+      'id',
+    ]);
+
+    const { id: userId } = await auth.getUser();
+
+    const order = await Order.findByOrFail({ id });
+    const lot = await Lot.findByOrFail({ id: order.lot_id });
+
+    if (lot.user_id === userId || order.user_id === userId) {
+      return order;
+    }
+
+    request.status(403).message('You cannot see someones\' order');
+  }
   /**
    * Render a form to update an existing order.
    * GET orders/:id/edit

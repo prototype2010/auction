@@ -1,14 +1,11 @@
-'use strict';
-
-/** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema');
 
 class OrderSchema extends Schema {
   up() {
     this.create('orders', (table) => {
       table.increments();
-      table.text('arrivalLocation').notNullable();
-      table.enu('arrivalType', [
+      table.text('arrival_location').notNullable();
+      table.enu('arrival_type', [
         'Royal Mail',
         'United States Postal Service',
         'DHL Express',
