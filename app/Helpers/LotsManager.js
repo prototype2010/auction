@@ -1,8 +1,7 @@
 /* eslint-disable */
 const Bull = require('bull');
-const moment = require('moment');
 const Lot = use('App/Models/Lot');
-const TimeUtils = use('TimeUtils');
+const { getDiffMillisecondsFromNow, shouldBeStartedNow, shouldBeRestartedNow, shouldBeClosedByTime } = use('TimeUtils');
 const Bid = use('App/Models/Bid');
 
 const LotsQueue = new Bull('lots');
@@ -15,22 +14,19 @@ LotsQueue.process(async job => {
 
 
   if(lot) {
-    if((moment().isAfter(lot.startTime) || moment().isSame(moment(lot.startTime)) ) && lot.status === 'pending' ) {
-      //start lot
+    if(shouldBeStartedNow(lot)) {
       lot.status = 'inProcess';
       await lot.save();
-      const lotEndTimeTask = TimeUtils.getDiffMillisecondsFromNow(lot.endTime)
+      const lotEndTimeTask = getDiffMillisecondsFromNow(lot.endTime)
       LotsQueue.add(lot, { delay: lotEndTimeTask });
     }
 
-    if((moment(lot.startTime).isAfter(moment())) && lot.status === 'pending') {
-      // restart task on update
-      const newStartTime = TimeUtils.getDiffMillisecondsFromNow(lot.startTime)
+    if(shouldBeRestartedNow(lot)) {
+      const newStartTime = getDiffMillisecondsFromNow(lot.startTime)
       LotsQueue.add(lot, { delay: newStartTime });
     }
 
-    if(moment(lot.endTime).isBefore(moment()) || moment().isSame(moment(lot.endTime)) ) {
-      // close lot by time
+    if(shouldBeClosedByTime(lot)) {
       lot.status = 'closed';
 
       const topBid = await Bid
