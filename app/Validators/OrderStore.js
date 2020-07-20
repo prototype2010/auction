@@ -5,7 +5,7 @@ const { BaseValidator } = require('./BaseValidator');
 class OrderStore extends BaseValidator {
   get rules() {
     return {
-      lotId: 'required|number|lotExists|lotInProcess',
+      lotId: 'required|number|lotExists|lotClosed',
       arrivalLocation: 'required|string',
       arrivalType: 'required|string',
     };
