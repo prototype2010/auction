@@ -179,7 +179,7 @@ test('Order can be updated', async ({ client, assert }) => {
 
   const newLocation = 'Donkey Cong country';
 
-  const updatedOrder = await client.put(`/orders/${order.id}`)
+  const updatedOrder = await client.put(`/orders/${order.body.id}`)
     .send({
       lotId: lot.id,
       arrivalLocation: newLocation,
@@ -192,3 +192,46 @@ test('Order can be updated', async ({ client, assert }) => {
 
   order.assertStatus(200);
 });
+
+test('Order lot cannot be updated', async ({ client }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  const lotToOrder = await Lot.find(lot.id);
+
+  lotToOrder.winner_id = bidder.id;
+  lotToOrder.status = 'closed';
+  await lotToOrder.save();
+
+  const order = await client.post('/orders')
+    .send({
+      lotId: lot.id,
+      arrivalLocation: 'Home',
+      arrivalType: 'DHL Express',
+    })
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  const newLocation = 'Donkey Cong country';
+
+  const updatedOrder = await client.put(`/orders/${order.body.id}`)
+    .send({
+      lotId: 77777,
+      arrivalLocation: newLocation,
+      arrivalType: 'DHL Express',
+    })
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  updatedOrder.assertStatus(422);
+}).timeout(0);

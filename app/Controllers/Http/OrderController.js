@@ -60,7 +60,8 @@ class OrderController {
     const { id } = params;
 
     const { arrivalLocation, arrivalType } = request.only([
-      'id',
+      'arrivalLocation',
+      'arrivalType',
     ]);
 
     const { id: userId } = await auth.getUser();
