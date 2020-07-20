@@ -6,8 +6,8 @@ class OrderStore extends BaseValidator {
   get rules() {
     return {
       lotId: 'required|number|lotExists|lotClosed',
-      arrivalLocation: 'required|string',
-      arrivalType: 'required|string',
+      arrivalLocation: 'required|string|validArrivalLocation',
+      arrivalType: 'required|string|validArrivalType',
     };
   }
 }

@@ -34,14 +34,14 @@ test('Order can be created', async ({ client }) => {
   const order = await client.post('/orders')
     .send({
       lotId: lot.id,
-      arrivalLocation: 'Home',
+      arrivalLocation: 'The best arrival location 1, room 206',
       arrivalType: 'DHL Express',
     })
     .loginVia(bidder.toJSON(), 'jwt')
     .end();
 
   order.assertStatus(200);
-});
+}).timeout(0);
 
 test('One order has been created', async ({ client, assert }) => {
   const creator = await Factory.model('App/Models/User').create();
@@ -68,7 +68,7 @@ test('One order has been created', async ({ client, assert }) => {
   await client.post('/orders')
     .send({
       lotId: lot.id,
-      arrivalLocation: 'Home',
+      arrivalLocation: 'The best arrival location 1, room 206',
       arrivalType: 'DHL Express',
     })
     .loginVia(bidder.toJSON(), 'jwt')
@@ -97,7 +97,7 @@ test('cannot be created on unfinished lot', async ({ client }) => {
   const order = await client.post('/orders')
     .send({
       lotId: lot.id,
-      arrivalLocation: 'Home',
+      arrivalLocation: 'The best arrival location 1, room 206',
       arrivalType: 'DHL Express',
     })
     .loginVia(bidder.toJSON(), 'jwt')
@@ -129,7 +129,7 @@ test('Order structure should match', async ({ client, assert }) => {
   const order = await client.post('/orders')
     .send({
       lotId: lot.id,
-      arrivalLocation: 'Home',
+      arrivalLocation: 'The best arrival location 1, room 206',
       arrivalType: 'DHL Express',
     })
     .loginVia(bidder.toJSON(), 'jwt')
@@ -171,13 +171,13 @@ test('Order can be updated', async ({ client, assert }) => {
   const order = await client.post('/orders')
     .send({
       lotId: lot.id,
-      arrivalLocation: 'Home',
+      arrivalLocation: 'The best arrival location 1, room 206',
       arrivalType: 'DHL Express',
     })
     .loginVia(bidder.toJSON(), 'jwt')
     .end();
 
-  const newLocation = 'Donkey Cong country';
+  const newLocation = 'The best arrival location 767777, room 206';
 
   const updatedOrder = await client.put(`/orders/${order.body.id}`)
     .send({
@@ -216,13 +216,13 @@ test('Order lot cannot be updated', async ({ client }) => {
   const order = await client.post('/orders')
     .send({
       lotId: lot.id,
-      arrivalLocation: 'Home',
+      arrivalLocation: 'The best arrival location 1, room 206',
       arrivalType: 'DHL Express',
     })
     .loginVia(bidder.toJSON(), 'jwt')
     .end();
 
-  const newLocation = 'Donkey Cong country';
+  const newLocation = 'The best arrival location 1, room 206, Donkey Cong country';
 
   const updatedOrder = await client.put(`/orders/${order.body.id}`)
     .send({
@@ -234,4 +234,78 @@ test('Order lot cannot be updated', async ({ client }) => {
     .end();
 
   updatedOrder.assertStatus(422);
+});
+
+test('Order cannot be updated with incorrect delivery type', async ({ client }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  const lotToOrder = await Lot.find(lot.id);
+
+  lotToOrder.winner_id = bidder.id;
+  lotToOrder.status = 'closed';
+  await lotToOrder.save();
+
+  const order = await client.post('/orders')
+    .send({
+      lotId: lot.id,
+      arrivalLocation: 'The best arrival location 1, room 206',
+      arrivalType: 'DHL Express',
+    })
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  const updatedOrder = await client.put(`/orders/${order.body.id}`)
+    .send({
+      lotId: 77777,
+      arrivalLocation: 'The best arrival location 1, room 206,Donkey Cong country',
+      arrivalType: 'Nova pochta',
+    })
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  updatedOrder.assertStatus(422);
+});
+
+test('Order cannot be created with incorrect delivery type', async ({ client }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  const lotToOrder = await Lot.find(lot.id);
+
+  lotToOrder.winner_id = bidder.id;
+  lotToOrder.status = 'closed';
+  await lotToOrder.save();
+
+  const order = await client.post('/orders')
+    .send({
+      lotId: lot.id,
+      arrivalLocation: 'The best arrival location 1, room 206',
+      arrivalType: 'Ukrpochta',
+    })
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+
+  order.assertStatus(422);
 }).timeout(0);
