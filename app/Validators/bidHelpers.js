@@ -33,6 +33,14 @@ const lotExists = async (data, field, message, args, get) => {
   return true;
 };
 
+const lotClosed = async (data, field, message, args, get) => {
+  const lotId = +get(data, 'lotId');
+
+  await Lot.findByOrFail({ id: lotId, status: 'closed' });
+
+  return true;
+};
+
 const lotInProcess = async (data, field, message, args, get) => {
   const lotId = +get(data, 'lotId');
 
@@ -41,4 +49,4 @@ const lotInProcess = async (data, field, message, args, get) => {
   return true;
 };
 
-module.exports = { lotInProcess, validBidPrice, lotExists, moreThanLotCurrentPrice };
+module.exports = { lotInProcess, validBidPrice, lotExists, moreThanLotCurrentPrice, lotClosed };

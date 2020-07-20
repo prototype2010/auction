@@ -24,6 +24,14 @@ Route.group(() => {
   Route.post('password-recovery/:token', 'UserController.applyPasswordRecovery').validator('passwordUpdate');
 }).prefix('users/auth');
 
+Route.group(() => {
+  Route.post('approve-delivered', 'OrderController.approveDelivered');
+  Route.post('approve-sent', 'OrderController.approveSent');
+
+  Route.resource('orders', 'OrderController')
+    .only(['update', 'store', 'index', 'show', 'destroy']);
+}).prefix('orders').middleware('auth');
+
 Route.post('users', 'UserController.store').validator('UserStore');
 Route.get('users/profile', 'UserController.profile').middleware('auth');
 

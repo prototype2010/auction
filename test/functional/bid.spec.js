@@ -14,9 +14,6 @@ const { getDBRowsNumber, waitFor } = require('../utils');
 trait('Test/ApiClient');
 trait('Auth/Client');
 
-
-trait('Test/ApiClient');
-
 test('Bid can be created', async () => {
   const creator = await Factory.model('App/Models/User').create();
   const bidder = await Factory.model('App/Models/User').create();
