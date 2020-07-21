@@ -276,6 +276,7 @@ test('Order cannot be updated with incorrect delivery type', async ({ client }) 
 
   updatedOrder.assertStatus(422);
 });
+/* eslint-disable */
 
 test('Order cannot be created with incorrect delivery type', async ({ client }) => {
   const creator = await Factory.model('App/Models/User').create();
@@ -308,4 +309,83 @@ test('Order cannot be created with incorrect delivery type', async ({ client }) 
 
 
   order.assertStatus(422);
+}).timeout(0);
+
+test('Order can be created via factory', async ({ client, assert }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+
+  await order.save();
+
+  const savedOrder = await Order.find(order.id)
+
+  const orderJSON = savedOrder.toJSON()
+
+  assert.containsAllKeys(orderJSON, ['arrival_location', 'arrival_type', 'user_id', 'status', 'lot_id', 'created_at', 'updated_at', 'id']);
+  assert.isOk(orderJSON.arrival_type);
+  assert.isOk(orderJSON.status);
+  assert.equal(orderJSON.status, 'pending');
+  assert.isOk(orderJSON.user_id);
+  assert.isOk(orderJSON.arrival_location);
+  assert.isOk(orderJSON.lot_id);
+  assert.isOk(orderJSON.created_at);
+  assert.isOk(orderJSON.updated_at);
+  assert.isOk(orderJSON.id);
+
+}).timeout(0);
+
+test('Order can be approved', async ({ client, assert }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+
+  await order.save();
+
+  const approval = await client.post(`/orders/approve-sent/${order.id}`)
+    .send()
+    .loginVia(creator.toJSON(), 'jwt')
+    .end();
+
+
+  approval.assertStatus(200);
+
 }).timeout(0);

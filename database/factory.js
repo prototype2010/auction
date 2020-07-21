@@ -27,6 +27,16 @@ Factory.blueprint('App/Models/Lot', () => {
   };
 });
 
+Factory.blueprint('App/Models/Order', () => ({
+  arrival_location: Faker.lorem.sentence().repeat(2),
+  arrival_type: [
+    'Royal Mail',
+    'United States Postal Service',
+    'DHL Express',
+  ][(Math.floor(Math.random() * 100)) % 3],
+  status: 'pending',
+}));
+
 Factory.blueprint('App/Models/User', async () => ({
   password: Faker.internet.password(),
   email: Faker.internet.email(),

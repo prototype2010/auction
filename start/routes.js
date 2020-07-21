@@ -25,8 +25,8 @@ Route.group(() => {
 }).prefix('users/auth');
 
 Route.group(() => {
-  Route.post('approve-delivered', 'OrderController.approveDelivered');
-  Route.post('approve-sent', 'OrderController.approveSent');
+  Route.post('approve-delivered/:id', 'OrderController.approveDelivered');
+  Route.post('approve-sent/:id', 'OrderController.approveSent');
 }).prefix('orders').middleware('auth');
 
 Route.resource('orders', 'OrderController')

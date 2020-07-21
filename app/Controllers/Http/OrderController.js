@@ -86,10 +86,10 @@ class OrderController {
     const { id: userId } = await auth.getUser();
 
     const order = await Order.findByOrFail({ id });
-    const user = await order.user();
+    // const user = await order.user();
 
     if (order.status === 'pending') {
-      if (user.id === userId) {
+      if (order.user_id === userId) {
         order.status = 'sent';
 
         await order.save();
