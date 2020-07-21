@@ -41,7 +41,7 @@ class OrderController {
   }
 
 
-  async show({ request, auth, params }) {
+  async show({ response, auth, params }) {
     const { id } = params;
 
     const { id: userId } = await auth.getUser();
@@ -53,7 +53,7 @@ class OrderController {
       return order;
     }
 
-    request.status(404).message('Not found');
+    response.status(404).send({ message: 'Not found' });
   }
 
   async update({ params, request, auth }) {
@@ -77,16 +77,15 @@ class OrderController {
       return order;
     }
 
-    request.status(403).message(`You can't update order in ${order.status} status`);
+    request.status(403).send({ message: `You can't update order in ${order.status} status` });
   }
 
-  async approveSent({ params, request, auth }) {
+  async approveSent({ params, response, auth }) {
     const { id } = params;
 
     const { id: userId } = await auth.getUser();
 
     const order = await Order.findByOrFail({ id });
-    // const user = await order.user();
 
     if (order.status === 'pending') {
       if (order.user_id === userId) {
@@ -97,13 +96,13 @@ class OrderController {
         return order;
       }
 
-      request.status(403).message('Cannot approve someone\'s orders');
+      response.status(403).send({ message: 'Cannot approve someone\'s orders' });
     }
 
-    request.status(403).message(`Cannot approve order in status ${order.status} status`);
+    response.status(403).send({ message: `Cannot approve order in status ${order.status} status` });
   }
 
-  async approveDelivered({ params, request, auth }) {
+  async approveDelivered({ params, response, auth }) {
     const { id } = params;
 
     const { id: userId } = await auth.getUser();
@@ -119,10 +118,10 @@ class OrderController {
         return order;
       }
 
-      request.status(403).message('Cannot approve someone\'s orders');
+      response.status(403).send({ message: 'Cannot approve someone\'s orders' });
     }
 
-    request.status(403).message(`Cannot approve order in status ${order.status} status`);
+    response.status(403).send({ message: `Cannot approve order in status ${order.status} status` });
   }
 
   async destroy({ params, request, auth }) {

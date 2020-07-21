@@ -354,7 +354,7 @@ test('Order can be created via factory', async ({ client, assert }) => {
 
 }).timeout(0);
 
-test('Order can be approved', async ({ client, assert }) => {
+test('Order cannot be approved by some one else', async ({ client, assert }) => {
   const creator = await Factory.model('App/Models/User').create();
   const bidder = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -386,6 +386,156 @@ test('Order can be approved', async ({ client, assert }) => {
     .end();
 
 
+  approval.assertStatus(403);
+
+}).timeout(0);
+
+test('Order can be approved by lot winner', async ({ client, assert }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+
+  await order.save();
+
+  const approval = await client.post(`/orders/approve-sent/${order.id}`)
+    .send()
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+
   approval.assertStatus(200);
 
 }).timeout(0);
+
+test('Order changes status correctly after approval', async ({ client, assert }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+
+  await order.save();
+
+  const approval = await client.post(`/orders/approve-sent/${order.id}`)
+    .send()
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  const approvedOrder = await Order.find(order.id);
+
+  assert.equal(approvedOrder.status, 'sent');
+
+}).timeout(0);
+
+test('Order can be viewed', async ({ client, assert }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+
+  await order.save();
+
+  const viewOrder = await client.get(`/orders/${order.id}`)
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  viewOrder.assertStatus(200);
+
+}).timeout(0);
+
+test('Order structure matches', async ({ client, assert }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+
+  await order.save();
+
+  const viewOrder = await client.get(`/orders/${order.id}`)
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  assert.containsAllKeys(viewOrder.body, ['arrival_location', 'arrival_type', 'user_id', 'status', 'lot_id', 'created_at', 'updated_at', 'id']);
+  assert.isOk(viewOrder.body.arrival_type);
+  assert.isOk(viewOrder.body.status);
+  assert.equal(viewOrder.body.status, 'pending');
+  assert.isOk(viewOrder.body.user_id);
+  assert.isOk(viewOrder.body.arrival_location);
+  assert.isOk(viewOrder.body.lot_id);
+  assert.isOk(viewOrder.body.created_at);
+  assert.isOk(viewOrder.body.updated_at);
+  assert.isOk(viewOrder.body.id);
+
+});
