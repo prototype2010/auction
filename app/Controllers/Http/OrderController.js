@@ -56,7 +56,7 @@ class OrderController {
     response.status(404).send({ message: 'Not found' });
   }
 
-  async update({ params, request, auth }) {
+  async update({ params, response, auth, request }) {
     const { id } = params;
 
     const { arrivalLocation, arrivalType } = request.only([
@@ -77,7 +77,7 @@ class OrderController {
       return order;
     }
 
-    request.status(403).send({ message: `You can't update order in ${order.status} status` });
+    response.status(403).send({ message: `You can't update order in ${order.status} status` });
   }
 
   async approveSent({ params, response, auth }) {

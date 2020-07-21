@@ -41,7 +41,7 @@ test('Order can be created', async ({ client }) => {
     .end();
 
   order.assertStatus(200);
-}).timeout(0);
+});
 
 test('One order has been created', async ({ client, assert }) => {
   const creator = await Factory.model('App/Models/User').create();
@@ -276,7 +276,7 @@ test('Order cannot be updated with incorrect delivery type', async ({ client }) 
 
   updatedOrder.assertStatus(422);
 });
-/* eslint-disable */
+
 
 test('Order cannot be created with incorrect delivery type', async ({ client }) => {
   const creator = await Factory.model('App/Models/User').create();
@@ -309,9 +309,9 @@ test('Order cannot be created with incorrect delivery type', async ({ client }) 
 
 
   order.assertStatus(422);
-}).timeout(0);
+});
 
-test('Order can be created via factory', async ({ client, assert }) => {
+test('Order can be created via factory', async ({ assert }) => {
   const creator = await Factory.model('App/Models/User').create();
   const bidder = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -337,9 +337,9 @@ test('Order can be created via factory', async ({ client, assert }) => {
 
   await order.save();
 
-  const savedOrder = await Order.find(order.id)
+  const savedOrder = await Order.find(order.id);
 
-  const orderJSON = savedOrder.toJSON()
+  const orderJSON = savedOrder.toJSON();
 
   assert.containsAllKeys(orderJSON, ['arrival_location', 'arrival_type', 'user_id', 'status', 'lot_id', 'created_at', 'updated_at', 'id']);
   assert.isOk(orderJSON.arrival_type);
@@ -351,10 +351,9 @@ test('Order can be created via factory', async ({ client, assert }) => {
   assert.isOk(orderJSON.created_at);
   assert.isOk(orderJSON.updated_at);
   assert.isOk(orderJSON.id);
+});
 
-}).timeout(0);
-
-test('Order cannot be approved by some one else', async ({ client, assert }) => {
+test('Order cannot be approved by some one else', async ({ client }) => {
   const creator = await Factory.model('App/Models/User').create();
   const bidder = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -387,10 +386,9 @@ test('Order cannot be approved by some one else', async ({ client, assert }) => 
 
 
   approval.assertStatus(403);
+});
 
-}).timeout(0);
-
-test('Order can be approved by lot winner', async ({ client, assert }) => {
+test('Order can be approved by lot winner', async ({ client }) => {
   const creator = await Factory.model('App/Models/User').create();
   const bidder = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -423,8 +421,7 @@ test('Order can be approved by lot winner', async ({ client, assert }) => {
 
 
   approval.assertStatus(200);
-
-}).timeout(0);
+});
 
 test('Order changes status correctly after approval', async ({ client, assert }) => {
   const creator = await Factory.model('App/Models/User').create();
@@ -452,7 +449,7 @@ test('Order changes status correctly after approval', async ({ client, assert })
 
   await order.save();
 
-  const approval = await client.post(`/orders/approve-sent/${order.id}`)
+  await client.post(`/orders/approve-sent/${order.id}`)
     .send()
     .loginVia(bidder.toJSON(), 'jwt')
     .end();
@@ -460,10 +457,9 @@ test('Order changes status correctly after approval', async ({ client, assert })
   const approvedOrder = await Order.find(order.id);
 
   assert.equal(approvedOrder.status, 'sent');
+});
 
-}).timeout(0);
-
-test('Order can be viewed', async ({ client, assert }) => {
+test('Order can be viewed', async ({ client }) => {
   const creator = await Factory.model('App/Models/User').create();
   const bidder = await Factory.model('App/Models/User').create();
   const lot = await Factory.model('App/Models/Lot').make();
@@ -494,8 +490,7 @@ test('Order can be viewed', async ({ client, assert }) => {
     .end();
 
   viewOrder.assertStatus(200);
-
-}).timeout(0);
+});
 
 test('Order structure matches', async ({ client, assert }) => {
   const creator = await Factory.model('App/Models/User').create();
@@ -537,5 +532,116 @@ test('Order structure matches', async ({ client, assert }) => {
   assert.isOk(viewOrder.body.created_at);
   assert.isOk(viewOrder.body.updated_at);
   assert.isOk(viewOrder.body.id);
+});
 
+test('Sent order cannot be updated', async ({ client }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+  order.status = 'sent';
+
+  await order.save();
+
+  const updatedOrder = await client.put(`/orders/${order.id}`)
+    .send({
+      lotId: lot.id,
+      arrivalLocation: 'The best arrival location 767777, room 206',
+      arrivalType: 'DHL Express',
+    })
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+
+  updatedOrder.assertStatus(403);
+});
+
+
+test('Sent order can be approved', async ({ client }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+  order.status = 'sent';
+
+  await order.save();
+
+  const approvedDelivered = await client.post(`/orders/approve-delivered/${order.id}`)
+    .send()
+    .loginVia(bidder.toJSON(), 'jwt')
+    .end();
+
+  approvedDelivered.assertStatus(200);
+});
+
+
+test('Sent order can be approved by some one else', async ({ client }) => {
+  const creator = await Factory.model('App/Models/User').create();
+  const bidder = await Factory.model('App/Models/User').create();
+  const lot = await Factory.model('App/Models/Lot').make();
+
+  await creator.lots().save(lot);
+
+  const bid = await Factory.model('App/Models/Bid').make();
+
+  bid.proposed_price = lot.currentPrice + 1;
+  bid.lot_id = lot.id;
+
+  await bidder.bids().save(bid);
+
+  lot.winner_id = bidder.id;
+  lot.status = 'closed';
+
+  await lot.save();
+
+  const order = await Factory.model('App/Models/Order').make();
+
+  order.user_id = bidder.id;
+  order.lot_id = lot.id;
+  order.status = 'sent';
+
+  await order.save();
+
+  const approvedDelivered = await client.post(`/orders/approve-delivered/${order.id}`)
+    .send()
+    .loginVia(creator.toJSON(), 'jwt')
+    .end();
+
+  approvedDelivered.assertStatus(403);
 });
